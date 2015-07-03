@@ -18,3 +18,4 @@ void matrix_LU( int, double*, double*, double* );
 void matrix_svd( int, int, double *, double*, double*, double* );
 double matrix_mlting( int, double* );
 double matrix_det( int, double* );
+void matrix2dMatrix(int, double* , dReal*);

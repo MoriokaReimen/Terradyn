@@ -5,8 +5,8 @@
 #include <math.h>
 #include <gsl/gsl_linalg.h>
 
-#include "matrix.h"
-#include "vector.h"
+#include "matrix.hpp"
+#include "vector.hpp"
 
 static void gsl_matrix_svd( int m, int n, double *a, double *u, double *s, double *v );
 static void gsl_matrix_pinv( int m, int n, double *a, double *u );
@@ -389,4 +389,12 @@ void gsl_matrix_pinv( int m, int n, double *a, double *u )
     free(S);
     free(S2);
 
+}
+
+void matrix2dMatrix(int n, double* m1, dReal* m2)
+{
+  for(int i = 0; i < n * n; ++i)
+    m2[i] = static_cast<dReal>(m1[i]);
+
+  return;
 }

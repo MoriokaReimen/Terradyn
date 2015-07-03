@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "vector.h"
+#include "vector.hpp"
 
 //_/_/_/ get vector /_/_/_//
 double *vector_get( int n )
@@ -135,4 +135,12 @@ void vector_scale( int n, double s, double *a, double *b )
         b[i] = s*A[i];
 
     free(A);
+}
+
+void vector2dVector(int n, double *v1, dReal *v2)
+{
+  for(int i =0; i < n; ++i)
+    v2[i] = static_cast<dReal>(v1[i]);
+
+  return;
 }
