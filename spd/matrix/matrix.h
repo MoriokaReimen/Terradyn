@@ -1,3 +1,5 @@
+#pragma once
+#include <ode/ode.h>
 double *matrix_get( int, int );
 void matrix_cpy( int, int, double*, double* );
 void matrix_I( int, double* );
