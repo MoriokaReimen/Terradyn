@@ -1,0 +1,55 @@
+CC = g++
+CFLAGS = -Wall -O2
+AR = ar
+
+INCLUDE = -I/usr/local/include
+
+SRC_DIR = src/
+MAT_DIR = matrix/
+LIB_DIR = lib/
+
+SRC =$(SRC_DIR)model_param.cpp\
+	$(SRC_DIR)model_init.cpp\
+	$(SRC_DIR)model_draw.cpp\
+	$(SRC_DIR)model_ode_result3.cpp\
+	$(SRC_DIR)f_kin2.cpp\
+	$(SRC_DIR)calc_jt.cpp\
+	$(SRC_DIR)calc_jr.cpp\
+	$(SRC_DIR)calc_jte.cpp\
+	$(SRC_DIR)calc_jre.cpp\
+	$(SRC_DIR)calc_HH_q.cpp\
+	$(SRC_DIR)drawstuff.cpp\
+	$(SRC_DIR)rot.cpp\
+	$(MAT_DIR)matrix.c\
+	$(MAT_DIR)vector.c
+
+OBJ =$(SRC_DIR)model_param.o\
+	$(SRC_DIR)model_init.o\
+	$(SRC_DIR)model_draw.o\
+	$(SRC_DIR)model_ode_result3.o\
+	$(SRC_DIR)f_kin2.o\
+	$(SRC_DIR)calc_jt.o\
+	$(SRC_DIR)calc_jr.o\
+	$(SRC_DIR)calc_jte.o\
+	$(SRC_DIR)calc_jre.o\
+	$(SRC_DIR)calc_HH_q.o\
+	$(SRC_DIR)drawstuff.o\
+	$(SRC_DIR)rot.o\
+	$(MAT_DIR)matrix.o\
+	$(MAT_DIR)vector.o
+
+TARGET = libspd.a
+
+#all : $(TARGET)
+
+$(LIB_DIR)$(TARGET) : $(OBJ)
+	$(AR) -r $(LIB_DIR)$(TARGET) $(OBJ)
+
+.cpp.o :
+	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+
+.c.o :
+	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+
+clean :
+	-@rm -f $(OBJ) $(LIB_DIR)$(TARGET)
