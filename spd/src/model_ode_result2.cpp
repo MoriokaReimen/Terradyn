@@ -23,34 +23,30 @@ void model_ode_result2( MODEL &m, Vector3 pos0, Matrix3 R0 )
 {
     int i, j;
     const dReal *tmp;
-    
-    
+
+
     tmp = dBodyGetPosition( m.link[0] );
     for( i=0 ; i<3 ; i++ )
-	pos0[i] = tmp[i];
-    
-    
+        pos0[i] = tmp[i];
+
+
     tmp = dBodyGetRotation( m.link[0]);
     for( i=0 ; i<3 ; i++ )
-	for( j=0 ; j<3 ; j++ )
-	    R0[3*i+j] = tmp[4*i+j];
-    
-    
-    if( m.LINKNUM != 1 )
-    {
-	for( i=1 ; i<m.LINKNUM ; i++ )
-	{
-	    if( m.J_type[i] == 0 )
-	    {
-	      	m.joint_param[i] = m.joint_param_init[i] + dJointGetHingeAngle( m.joint[i] );
-			m.joint_param_vel[i] = dJointGetHingeAngleRate( m.joint[i] );
-	    }
-	    if( m.J_type[i] == 1 )
-	    {
-		m.joint_param[i] = dJointGetSliderPosition( m.joint[i] );
-		m.joint_param_vel[i] = dJointGetSliderPositionRate( m.joint[i] );
-	    }
-	}
+        for( j=0 ; j<3 ; j++ )
+            R0[3*i+j] = tmp[4*i+j];
+
+
+    if( m.LINKNUM != 1 ) {
+        for( i=1 ; i<m.LINKNUM ; i++ ) {
+            if( m.J_type[i] == 0 ) {
+                m.joint_param[i] = m.joint_param_init[i] + dJointGetHingeAngle( m.joint[i] );
+                m.joint_param_vel[i] = dJointGetHingeAngleRate( m.joint[i] );
+            }
+            if( m.J_type[i] == 1 ) {
+                m.joint_param[i] = dJointGetSliderPosition( m.joint[i] );
+                m.joint_param_vel[i] = dJointGetSliderPositionRate( m.joint[i] );
+            }
+        }
     }
-    
+
 }
