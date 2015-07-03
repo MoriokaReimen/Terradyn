@@ -115,7 +115,23 @@ void vector_z( int n, double *a )
         a[i] = 0.0;
 }
 
+void vector_z( int n, dReal *a )
+{
+    int i;
+
+    for( i=0 ; i<n ; i++ )
+        a[i] = 0.0;
+}
+
 void vector_i( int n, double *a )
+{
+    int i;
+
+    for( i=0 ; i<n ; i++ )
+        a[i] = 1.0;
+}
+
+void vector_i( int n, dReal *a )
 {
     int i;
 
