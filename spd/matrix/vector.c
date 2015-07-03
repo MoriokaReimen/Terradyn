@@ -14,10 +14,9 @@ double *vector_get( int n )
 void vector_cpy( int n, double *a, double *u )
 {
     int i;
-    
-    for ( i = 0 ; i < n ; i++ )
-    {
-	u[ i ] = a[ i ];
+
+    for ( i = 0 ; i < n ; i++ ) {
+        u[ i ] = a[ i ];
     }
 }
 
@@ -25,9 +24,9 @@ void vector_cpy( int n, double *a, double *u )
 void vector_print( int n, double *a )
 {
     int	i;
-    
+
     for ( i=0 ; i<n ; i++ )
-	printf("%f ", a[ i ]);  
+        printf("%f ", a[ i ]);
     printf("\n");
 }
 
@@ -36,9 +35,9 @@ void vector_print( int n, double *a )
 void vector_print_int( int n, int *a )
 {
     int	i;
-    
+
     for ( i=0 ; i<n ; i++ )
-	printf("%d ", a[ i ]);  
+        printf("%d ", a[ i ]);
     printf("\n");
 }
 
@@ -47,10 +46,9 @@ void vector_print_int( int n, int *a )
 void vector_add( int n, double *a, double *b, double *c )
 {
     int i;
-    
-    for( i=0 ; i<n ; i++ )
-    {
-	c[i] = a[i] + b[i];
+
+    for( i=0 ; i<n ; i++ ) {
+        c[i] = a[i] + b[i];
     }
 }
 
@@ -59,10 +57,9 @@ void vector_add( int n, double *a, double *b, double *c )
 void vector_sub( int n, double *a, double *b, double *c )
 {
     int i;
-    
-    for( i=0 ; i<n ; i++ )
-    {
-	c[i] = a[i] - b[i];
+
+    for( i=0 ; i<n ; i++ ) {
+        c[i] = a[i] - b[i];
     }
 }
 
@@ -73,17 +70,16 @@ double vector_inner( int n, double *a, double *b )
     int i;
     double sum;
     double *tmp = vector_get( n );
-    
+
     sum = 0.0;
-    
-    for( i=0 ; i<n ; i++ )
-    {
-	tmp[i] = a[i]*b[i];
-	sum +=tmp[i];
+
+    for( i=0 ; i<n ; i++ ) {
+        tmp[i] = a[i]*b[i];
+        sum +=tmp[i];
     }
-  
+
     free( tmp );
-    
+
     return sum;
 }
 
@@ -114,29 +110,29 @@ void vector_tilde3( double *a, double *b )
 void vector_z( int n, double *a )
 {
     int i;
-    
+
     for( i=0 ; i<n ; i++ )
-	a[i] = 0.0;
+        a[i] = 0.0;
 }
 
 void vector_i( int n, double *a )
 {
     int i;
-    
+
     for( i=0 ; i<n ; i++ )
-	a[i] = 1.0;
+        a[i] = 1.0;
 }
 
 void vector_scale( int n, double s, double *a, double *b )
 {
     int i;
-    
+
     double *A = vector_get(n);
-    
+
     vector_cpy(n,a,A);
-    
+
     for( i=0 ; i<n ; i++ )
-	b[i] = s*A[i];
-    
+        b[i] = s*A[i];
+
     free(A);
 }
