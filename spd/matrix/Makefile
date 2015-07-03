@@ -1,8 +1,8 @@
-CC = g++
+CC = clang++
 AR = ar
-CFLAGS = -O3 -Wall -I/usr/local/include
+CFLAGS = -O3 -Wall -std=c++11 -I/usr/local/include
 
-SRC = matrix.c vector.c
+SRC = matrix.cpp vector.cpp
 OBJ = matrix.o vector.o
 TARGET = libmatrix.a
 
