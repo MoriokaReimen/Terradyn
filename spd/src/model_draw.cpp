@@ -18,8 +18,8 @@ using namespace std;
 #define dsDrawCylinder dsDrawCylinderD
 #endif
 
-#include "../matrix/matrix.h"
-#include "../matrix/vector.h"
+#include "../matrix/matrix.hpp"
+#include "../matrix/vector.hpp"
 #include "../include/define.h"
 #include "../include/spd.h"
 #include "../include/rot.h"
@@ -42,8 +42,8 @@ void model_draw( MODEL &m )
     dReal ground_sides[3] = {4,2,0.0};
 
     //new
-    dVector3 angle;
-    dMatrix3 angle_R;
+    Vector3 angle;
+    Matrix3 angle_R;
     angle[0]=delta;
     angle[1]=0.0;
     angle[2]=0.0;
@@ -86,7 +86,9 @@ void model_draw( MODEL &m )
                 for( k=0 ; k<3 ; k++ )
                     tmp2[4*j+k] = m.link_R[i][3*j+k];
 
-            dsDrawSphereD (tmp1, tmp2, RAD);
+            double pos[3]{tmp1[0], tmp1[1], tmp1[2]};
+            double axis[3]{tmp2[0], tmp2[1], tmp2[2]};
+            dsDrawSphereD (pos, axis, RAD);
         }
 
         // link

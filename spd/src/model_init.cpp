@@ -13,8 +13,8 @@ using namespace std;
 
 #include <ode/ode.h>
 
-#include "../matrix/matrix.h"
-#include "../matrix/vector.h"
+#include "../matrix/matrix.hpp"
+#include "../matrix/vector.hpp"
 #include "../include/spd.h"
 #include "../include/rot.h"
 
@@ -94,10 +94,7 @@ void model_init( dWorldID &w, MODEL &m )
 
 
         // Set_Z_Axis_As_a_Rotation_Axis_of_Each_Joints
-        dVector3 rela_axis;
-        vector_z( 3, rela_axis );
-        rela_axis[2] = -1;
-
+        dVector3 rela_axis{0.f, 0.f, -1.f};
 
         // setting rotaton axis of each joints
         for( i=1 ; i<m.LINKNUM ; i++ )
@@ -118,7 +115,12 @@ void model_init( dWorldID &w, MODEL &m )
         m.link[i] = dBodyCreate ( w );
         dBodySetMass ( m.link[i], &m.mass[i] );
         dBodySetPosition ( m.link[i], m.link_pos[i][0], m.link_pos[i][1], m.link_pos[i][2] );
-        dBodySetQuaternion ( m.link[i], (m.link_q[i]) );
+        dQuaternion quat;
+        quat[0] = m.link_q[i][0];
+        quat[1] = m.link_q[i][1];
+        quat[2] = m.link_q[i][2];
+        quat[3] = m.link_q[i][3];
+        dBodySetQuaternion ( m.link[i], quat);
         dBodySetGravityMode( m.link[i], 1 );
     }
 

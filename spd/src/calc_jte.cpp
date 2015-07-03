@@ -12,8 +12,8 @@
 #include<stdio.h>
 using namespace std;
 
-#include "../matrix/matrix.h"
-#include "../matrix/vector.h"
+#include "../matrix/matrix.hpp"
+#include "../matrix/vector.hpp"
 #include "../include/model.h"
 #include "../include/rot.h"
 

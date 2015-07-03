@@ -21,8 +21,8 @@ using namespace std;
 #include "spd/include/define.h"
 #include "spd/include/spd.h"
 #include "spd/include/rot.h"
-#include "spd/matrix/matrix.h"
-#include "spd/matrix/vector.h"
+#include "spd/matrix/matrix.hpp"
+#include "spd/matrix/vector.hpp"
 
 #ifdef DRAWSTUFF
 //#include <drawstuff/drawstuff.h>

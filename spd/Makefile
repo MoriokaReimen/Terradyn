@@ -1,5 +1,5 @@
 CC = clang++
-CFLAGS = -Wall -O2 -m32
+CFLAGS = -std=c++11 -Wall -O2 -m32
 AR = ar
 
 INCLUDE = -I/usr/local/include
