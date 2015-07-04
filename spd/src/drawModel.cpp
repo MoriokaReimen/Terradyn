@@ -11,8 +11,7 @@
 using namespace std;
 
 #include <ode/ode.h>
-//#include <drawstuff/drawstuff.h>
-#include "../../drawstuff/drawstuff.h"
+#include <drawstuff/drawstuff.h>
 #ifdef dDOUBLE
 #define dsDrawBox dsDrawBoxD
 #define dsDrawCylinder dsDrawCylinderD
@@ -29,7 +28,7 @@ using namespace std;
 #include "../../terra/terradyn2.h"
 
 
-void model_draw( MODEL &m )
+void drawModel( Model &m )
 {
     int i,j,k;
     dVector3 tmp1;
@@ -60,17 +59,11 @@ void model_draw( MODEL &m )
     dsSetColor(1,1,0);
     dsDrawBox( tmp1, tmp2, sides );
 
-    //draw ground
-    /*    dsSetColor(1,1,1);
-    for( i=0 ; i<3 ; i++ ) tmp1[i] = 0.0;
-    dsDrawBox(tmp1, tmp2, ground_sides );//*/
-    //new
     dsSetColor(1,1,1);
     tmp1[0]=0.0;
     tmp1[1]=0.0;
     tmp1[2]=0.0165432;
-    //for(i=0;i<3;i++)
-    //	tmp1[i]=0.0;//Šî€À•WŒn‚ÌŒ´“_‚É’u‚­
+
     for( j=0 ; j<3 ; j++ )
         for( k=0 ; k<3 ; k++ )
             tmp2[4*j+k] = angle_R[3*j+k];
