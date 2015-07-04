@@ -11,18 +11,31 @@
 // modified by Kei [2015.7]
 //       - C++ 11
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_//
-#include<stdio.h>
-#include<math.h>
+#include<cstdio>
+#include<cmath>
 
 #include"terradyn.hpp"
 
 #define _USE_MATH_DEFINES
-#define sqr_f(x) x*x
-#define cot(x) 1/tan(x)
-#define deg2rad(x) x*M_PI/180.0
-#define rad2deg(x) x/M_PI*180.0
+
+double cot(const double& radian)
+{
+  return std::tan(M_PI_2 - radian);
+}
+
+double deg2rad(const double& degree)
+{
+  return degree*M_PI/180.0;
+}
+
+double rad2deg(const double& radian)
+{
+  return radian/M_PI*180.0;
+}
+
 
 double Dz = 1.0;
+
 
 
 int sgn2(double val)
