@@ -1,99 +1,122 @@
-//_/_/_/_/ vector library _/_/_/_//
-
-#include <stdio.h>
-#include <stdlib.h>
+//_/_/_/_/ vector class _/_/_/_//
 #include "vector.hpp"
 
-//_/_/_/ get vector /_/_/_//
-double *vector_get( int n )
+Vector3::Vector3() : x_(0.0), y_(0.0), z_(0.0)
 {
-    return ( double * ) malloc( sizeof( double ) * n );
+  return;
 }
 
-//_/_/_/ copy vector /_/_/_//
-void vector_cpy( int n, double *a, double *u )
+Vector3::Vector3(const double x, const double y, const double z)
 {
-    int i;
+  this->x_ = x;
+  this->y_ = y;
+  this->z_ = z;
 
-    for ( i = 0 ; i < n ; i++ ) {
-        u[ i ] = a[ i ];
-    }
+  return;
 }
 
-//_/_/ print vector _/_//
-void vector_print( int n, double *a )
+void Vector3::set(const double x, const double y, const double z)
 {
-    int	i;
+  this->x_ = x;
+  this->y_ = y;
+  this->z_ = z;
 
-    for ( i=0 ; i<n ; i++ )
-        printf("%f ", a[ i ]);
-    printf("\n");
+  return;
 }
 
-
-//_/_/ print vector _/_//
-void vector_print_int( int n, int *a )
+void Vector3::setIdentity()
 {
-    int	i;
+  this->x_ = 1.0;
+  this->y_ = 1.0;
+  this->z_ = 1.0;
 
-    for ( i=0 ; i<n ; i++ )
-        printf("%d ", a[ i ]);
-    printf("\n");
+  return;
 }
 
-
-//_/_/_/ addition /_/_/_//
-void vector_add( int n, double *a, double *b, double *c )
+void Vector3::setZero()
 {
-    int i;
+  this->x_ = 0.0;
+  this->y_ = 0.0;
+  this->z_ = 0.0;
 
-    for( i=0 ; i<n ; i++ ) {
-        c[i] = a[i] + b[i];
-    }
+  return;
+}
+void Vector3::scale(const double& s)
+{
+  this->x_ = s * this->x_;
+  this->y_ = s * this->y_;
+  this->z_ = s * this->z_;
+
+  return;
 }
 
-
-//_/_/_/ subtraction /_/_/_//
-void vector_sub( int n, double *a, double *b, double *c )
+void Vector3::todReal(dReal* out)
 {
-    int i;
+  out[0] = static_cast<dReal>(this->x_);
+  out[1] = static_cast<dReal>(this->y_);
+  out[2] = static_cast<dReal>(this->z_);
 
-    for( i=0 ; i<n ; i++ ) {
-        c[i] = a[i] - b[i];
-    }
+  return;
 }
 
-
-//_/_/_/ return an inner product of matrix a & b /_/_/_//
-double vector_inner( int n, double *a, double *b )
+Vector3& Vector3::operator+=(const Vector3& rhs)
 {
-    int i;
-    double sum;
-    double *tmp = vector_get( n );
+  this->x_ += rhs.x_;
+  this->y_ += rhs.y_;
+  this->z_ += rhs.z_;
 
-    sum = 0.0;
+  return *this;
+}
 
-    for( i=0 ; i<n ; i++ ) {
-        tmp[i] = a[i]*b[i];
-        sum +=tmp[i];
-    }
+Vector3& Vector3::operator-=(const Vector3& rhs)
+{
+  this->x_ -= rhs.x_;
+  this->y_ -= rhs.y_;
+  this->z_ -= rhs.z_;
 
-    free( tmp );
+  return *this;
+}
+
+Vector3 operator+(const Vector3& lhs, const Vector3& rhs)
+{
+    Vector3 out;
+    out.x_ = lhs.x_ + rhs.x_;
+    out.y_ = lhs.y_ + rhs.y_;
+    out.z_ = lhs.z_ + rhs.z_;
+
+    return out;
+}
+
+Vector3 operator-(const Vector3& lhs, const Vector3& rhs)
+{
+    Vector3 out;
+    out.x_ = lhs.x_ - rhs.x_;
+    out.y_ = lhs.y_ - rhs.y_;
+    out.z_ = lhs.z_ - rhs.z_;
+
+    return out;
+}
+
+double dot(const Vector3& lhs, const Vector3& rhs)
+{
+    double sum(0.0);
+    sum += lhs.x_ * rhs.x_;
+    sum += lhs.y_ * rhs.y_;
+    sum += lhs.z_ * rhs.z_;
 
     return sum;
 }
 
-
-//_/_/_/ return a cross product of matrix a(3x1) & b(3x1) /_/_/_//
-void vector_cross3( double *a, double *b, double *c )
+Vector3 cross(const Vector3& lhs, const Vector3& rhs)
 {
-    c[0] = a[1]*b[2]-a[2]*b[1];
-    c[1] = a[2]*b[0]-a[0]*b[2];
-    c[2] = a[0]*b[1]-a[1]*b[0];
+    Vector3 out;
+    out.x_ = lhs.y_*rhs.z_-lhs.z_*rhs.y_;
+    out.y_ = lhs.z_*rhs.x_-lhs.x_*rhs.z_;
+    out.z_ = lhs.x_*rhs.y_-lhs.y_*rhs.x_;
+    return out;
 }
 
-
-//_/_/_/ return a tilde matrix form vector3 /_/_/_//
+/* implement later
 void vector_tilde3( double *a, double *b )
 {
     b[0] = 0;
@@ -106,59 +129,4 @@ void vector_tilde3( double *a, double *b )
     b[7] = a[0];
     b[8] = 0;
 }
-
-void vector_z( int n, double *a )
-{
-    int i;
-
-    for( i=0 ; i<n ; i++ )
-        a[i] = 0.0;
-}
-/*
-void vector_z( int n, dReal *a )
-{
-    int i;
-
-    for( i=0 ; i<n ; i++ )
-        a[i] = 0.0;
-}
 */
-
-void vector_i( int n, double *a )
-{
-    int i;
-
-    for( i=0 ; i<n ; i++ )
-        a[i] = 1.0;
-}
-/*
-void vector_i( int n, dReal *a )
-{
-    int i;
-
-    for( i=0 ; i<n ; i++ )
-        a[i] = 1.0;
-}
-*/
-
-void vector_scale( int n, double s, double *a, double *b )
-{
-    int i;
-
-    double *A = vector_get(n);
-
-    vector_cpy(n,a,A);
-
-    for( i=0 ; i<n ; i++ )
-        b[i] = s*A[i];
-
-    free(A);
-}
-
-void vector2dVector(int n, double *v1, dReal *v2)
-{
-  for(int i =0; i < n; ++i)
-    v2[i] = static_cast<dReal>(v1[i]);
-
-  return;
-}

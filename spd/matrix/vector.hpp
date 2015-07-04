@@ -2,18 +2,24 @@
 #pragma once
 #include <ode/ode.h>
 
-double *vector_get( int );
-void vector_cpy( int, double*, double* );
-void vector_print( int, double* );
-void vector_print_int( int, int* );
-void vector_add( int, double*, double*, double* );
-void vector_sub( int, double*, double*, double* );
-void vector_cross3( double*, double*, double* );
-void vector_tilde3( double*, double* );
-void vector_z( int, double* );
-void vector_z( int, dReal* );
-void vecotr_i( int, double* );
-void vecotr_i( int, dReal* );
-void vecotr_scale( int, double, double*, double* );
-double vector_inner( int, double*, double* );
-void vector2dVector(int n, double *v1, dReal *v2);
+class Vector3
+{
+    double x_;
+    double y_;
+    double z_;
+
+public:
+    Vector3();
+    Vector3(const double x, const double y, const double z);
+    void set(const double x, const double y, const double z);
+    void setIdentity();
+    void setZero();
+    void scale(const double& s);
+    void todReal(dReal* out);
+    Vector3& operator+=(const Vector3& rhs);
+    Vector3& operator-=(const Vector3& rhs);
+friend Vector3 operator+(const Vector3& lhs, const Vector3& rhs);
+friend Vector3 operator-(const Vector3& lhs, const Vector3& rhs);
+friend double dot(const Vector3& lhs, const Vector3& rhs);
+friend Vector3 cross(const Vector3& lhs, const Vector3& rhs);
+};
