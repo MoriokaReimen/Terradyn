@@ -14,15 +14,15 @@
 #include<stdio.h>
 #include<math.h>
 
-#include"terradyn.h"
+#include"terradyn.hpp"
 
+#define _USE_MATH_DEFINES
 #define sqr_f(x) x*x
 #define cot(x) 1/tan(x)
 #define deg2rad(x) x*M_PI/180.0
 #define rad2deg(x) x/M_PI*180.0
 
-constexpr double Dz = 1.0;
-constexpr double M_PI{3.14159265358979323846};
+double Dz = 1.0;
 
 
 int sgn2(double val)
@@ -132,7 +132,7 @@ void calc_dFb(double s, double beta, double h, double dFb[])
 
         // Stresses
         sigma = calc_sigma_inclined(theta, theta_f, theta_r, theta_m);
-        calc_tau(s, beta, theta, theta_f, sigma, tau);
+        calcTau(s, beta, theta, theta_f, sigma, tau);
 
         dFx += tau[1]*cos(theta) - sigma*sin(theta);
         dFy += tau[2];
@@ -162,11 +162,11 @@ void calc_Fb(double s, double beta, double roll, double theta_f0, double theta_r
     h0 = w_rad*(1-cos(theta_f0));
 
     // Effective wheel width
-    calc_width(roll, h0);
+    calcWidth(roll, h0);
 
     for(y=-w_b/2.0; y<=w_b/2.0; y+=DELTA_Y)
     {   // Forces at position y
-        h = calc_sinkage(roll, h0, y);
+        h = calcSinkage(roll, h0, y);
         calc_dFb(s, beta, h, dFb);
         for(int i=0; i<5; i++)
         {   Fb[i] += dFb[i]*DELTA_Y; // Fxb, Fyb, Fzb, Tz, Tx
@@ -201,10 +201,10 @@ double calcInitSinkage(double W, double roll)
         integral_dush = 0.0;
 
         h0 = w_rad*(1-cos(theta_fc0));
-        calc_width(roll, h0);
+        calcWidth(roll, h0);
 
         for(double y=-w_b/2.0; y<=w_b/2.0; y+=DELTA_Y)
-        {   h = calc_sinkage(roll, h0, y);
+        {   h = calcSinkage(roll, h0, y);
             theta_fc = acos(1-h/w_rad);
             theta_r = 2 * alpha - theta_fc;
 
@@ -220,10 +220,10 @@ double calcInitSinkage(double W, double roll)
 
         if(fabs(delta2) > 0.01)
         {   if(roll > 0)
-            {   h = calc_sinkage(roll, h0, -w_b/2.0);
+            {   h = calcSinkage(roll, h0, -w_b/2.0);
             }
             else
-            {   h = calc_sinkage(roll, h0, w_b/2.0);
+            {   h = calcSinkage(roll, h0, w_b/2.0);
             }
             theta_fc = acos(1-h/w_rad);
             theta_r = 2*alpha - theta_fc;
