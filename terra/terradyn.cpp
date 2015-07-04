@@ -34,11 +34,11 @@ double rad2deg(const double& radian)
 }
 
 
-double Dz = 1.0;
+const double Dz = 1.0;
 
 
 
-int sgn2(double val)
+int sgn2(const double& val)
 {
   if(val>0)
     {   return  1;
@@ -51,7 +51,7 @@ int sgn2(double val)
 
 
 /* Caclculate effective wheel width *//////////////////////////////////////////////
-void calcWidth(double roll, double h0)
+void calcWidth(const double& roll, const double& h0)
 {
   if(fabs(roll) < 0.01)
     {   w_b_eff = w_b;
@@ -67,7 +67,7 @@ void calcWidth(double roll, double h0)
 
 
 /* Calculate lateral sinkage distribution *////////////////////////////////////////
-double calcSinkage(double roll, double h0, double y)
+double calcSinkage(const double& roll, const double& h0, const double& y)
 {
     double h;
     h = (y*tan(roll)+h0);
@@ -83,7 +83,7 @@ double calcSinkage(double roll, double h0, double y)
 
 
 /* Calculate lateral normal stress distribution *//////////////////////////////////
-double calc_sigma_inclined(double theta, double theta_f, double theta_r, double theta_m)
+double calc_sigma_inclined(const double& theta, const double& theta_f, const double& theta_r, const double& theta_m)
 {
     double k_sigma;
 
@@ -104,8 +104,9 @@ double calc_sigma_inclined(double theta, double theta_f, double theta_r, double 
 
 
 /* Calculate shear stresses *//////////////////////////////////////////////////////
-void calcTau(double s, double beta, double theta, double theta_f, double sigma, double tau[])
-{   double eta, ajt, ajl, j, jt, jl;
+void calcTau(const double& s, const double& beta, const double& theta, const double& theta_f, const double& sigma, double tau[])
+{
+    double eta, ajt, ajl, j, jt, jl;
 
     // Soil slip angle
     ajt = 1-(1-s)*cos(theta);
@@ -126,7 +127,7 @@ void calcTau(double s, double beta, double theta, double theta_f, double sigma, 
 
 
 /* Calculate dFxb, dFyb, dFzb, dTz, dTx *//////////////////////////////////////////
-void calc_dFb(double s, double beta, double h, double dFb[])
+void calc_dFb(const double& s, const double& beta, const double& h, double dFb[])
 {   double theta_f, theta_r, theta_m;
     double theta;
     double h_theta;
@@ -162,7 +163,7 @@ void calc_dFb(double s, double beta, double h, double dFb[])
 
 
 /* Calculate Fxb, Fyb, Fzb, Tz, Tx *///////////////////////////////////////////////
-void calc_Fb(double s, double beta, double roll, double theta_f0, double theta_r0, double Fb[])
+void calc_Fb(const double& s, const double& beta, const double& roll, const double& theta_f0, const double& theta_r0, double Fb[])
 {   double h0, h;
     double y;
     double dFb[5]= {};
@@ -190,7 +191,7 @@ void calc_Fb(double s, double beta, double roll, double theta_f0, double theta_r
 
 
 /* Calculate initial sinkage at y=0 *//////////////////////////////////////////////
-double calcInitSinkage(double W, double roll)
+double calcInitSinkage(const double& W, const double& roll)
 {
     double N, e;
     double K_tmp, K, K_dush, integral, integral_dush;
@@ -271,8 +272,8 @@ double calcInitSinkage(double W, double roll)
 
 
 /* Calculate wheel forces *////////////////////////////////////////////////////////
-void tCalc_Fe_positive2(double s, double beta, double theta_f0, double theta_r0,
-                        double vz, double PHI, double *fe, double roll)
+void tCalc_Fe_positive2(const double& s, const double& beta, double theta_f0, double theta_r0,
+                        const double& vz, const double& PHI, double *fe, const double& roll)
 {   double Fb[5]= {}, Fs[3]= {};
 
     for(int i=0; i<5; i++)
