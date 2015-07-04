@@ -8,22 +8,26 @@
 //
 // modified by INO [2012.12]
 //       - extended to inclined wheels
+// modified by Kei [2015.7]
+//       - C++ 11
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_//
 #include<stdio.h>
 #include<math.h>
 
-#include"terradyn2.h"
+#include"terradyn.h"
 
 #define sqr_f(x) x*x
 #define cot(x) 1/tan(x)
 #define deg2rad(x) x*M_PI/180.0
 #define rad2deg(x) x/M_PI*180.0
 
-static double Dz = 1.0;
+constexpr double Dz = 1.0;
+constexpr double M_PI{3.14159265358979323846};
 
 
 int sgn2(double val)
-{   if(val>0)
+{
+  if(val>0)
     {   return  1;
     }
     else if(val<0)
@@ -34,8 +38,9 @@ int sgn2(double val)
 
 
 /* Caclculate effective wheel width *//////////////////////////////////////////////
-void calc_width(double roll, double h0)
-{   if(fabs(roll) < 0.01)
+void calcWidth(double roll, double h0)
+{
+  if(fabs(roll) < 0.01)
     {   w_b_eff = w_b;
     }
     else
@@ -49,14 +54,16 @@ void calc_width(double roll, double h0)
 
 
 /* Calculate lateral sinkage distribution *////////////////////////////////////////
-double calc_sinkage(double roll, double h0, double y)
-{   double h;
+double calcSinkage(double roll, double h0, double y)
+{
+    double h;
     h = (y*tan(roll)+h0);
     if (h > 0.0)
     {   return h;
     }
     else
-    {   return 0.0;
+    {
+      return 0.0;
     }
 }
 ///////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +71,8 @@ double calc_sinkage(double roll, double h0, double y)
 
 /* Calculate lateral normal stress distribution *//////////////////////////////////
 double calc_sigma_inclined(double theta, double theta_f, double theta_r, double theta_m)
-{   double k_sigma;
+{
+    double k_sigma;
 
     // Normal stress coeffiecient
     k_sigma = (SOIL_C*SOIL_KC+SOIL_GAMMA*w_b_eff*SOIL_KPHI)*pow(w_rad/w_b_eff, SOIL_N);
@@ -83,7 +91,7 @@ double calc_sigma_inclined(double theta, double theta_f, double theta_r, double 
 
 
 /* Calculate shear stresses *//////////////////////////////////////////////////////
-void calc_tau(double s, double beta, double theta, double theta_f, double sigma, double tau[])
+void calcTau(double s, double beta, double theta, double theta_f, double sigma, double tau[])
 {   double eta, ajt, ajl, j, jt, jl;
 
     // Soil slip angle
@@ -169,8 +177,9 @@ void calc_Fb(double s, double beta, double roll, double theta_f0, double theta_r
 
 
 /* Calculate initial sinkage at y=0 *//////////////////////////////////////////////
-double tInit_sinkage2(double W, double roll)
-{   double N, e;
+double calcInitSinkage(double W, double roll)
+{
+    double N, e;
     double K_tmp, K, K_dush, integral, integral_dush;
     double theta_fc0, theta_fc, theta_r;
     double h, h0;
@@ -184,7 +193,6 @@ double tInit_sinkage2(double W, double roll)
     e = 10000;
     delta2 = delta - roll;
 
-    //while(fabs(e) > 0.0000001){
     while(fabs(e) > 0.01)
     {
 

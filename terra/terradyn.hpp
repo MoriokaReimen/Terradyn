@@ -9,7 +9,6 @@
 #ifndef TERRADYN_H
 #define TERRADYN_H
 
-#define M_PI 3.14159265358979323846
 
 // Wheel parameters /////////////////////////////////////
 #define w_rad  0.102	// Wheel radius [m]
