@@ -24,11 +24,8 @@ using namespace std;
 #include "spd/matrix/matrix.hpp"
 #include "spd/matrix/vector.hpp"
 
-#ifdef DRAWSTUFF
-//#include <drawstuff/drawstuff.h>
-#include "drawstuff/drawstuff.h"
+#include <drawstuff/drawstuff.h>
 #include "spd/include/draw.h"
-#endif
 
 #include "terra/terradyn2.h"
 
@@ -223,14 +220,14 @@ int main(void)
     //model_param( "spd/model/dora2_phi00_center_intertia.txt", rover );
     //model_param( "spd/model/dora2_phi05_center_intertia.txt", rover );
 
-    model_param( "spd/model/dora2_micro_phi00_modified.txt", rover);
+    //model_param( "spd/model/dora2_micro_phi00_modified.txt", rover);
     //model_param( "spd/model/dora2_micro_phi05_modified.txt", rover);
     //model_param( "spd/model/dora2_micro_phi10_modified.txt", rover);
     //model_param( "spd/model/dora2_micro_phi15_modified.txt", rover);
     //model_param( "spd/model/dora2_micro_phi20_modified.txt", rover);
     //model_param( "spd/model/dora2_micro_phi15_modified_center.txt", rover);
 
-    //model_param( "spd/model/dora2_micro_phi00.txt", rover);
+    model_param( "spd/model/dora2_micro_phi00.txt", rover);
     //model_param( "spd/model/dora2_micro_phi01.txt", rover);
     //model_param( "spd/model/dora2_micro_phi02.txt", rover);
     //model_param( "spd/model/dora2_micro_phi03.txt", rover);
@@ -448,12 +445,7 @@ int main(void)
 ///_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ///_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-#ifdef DRAWSTUFF
 void simLoop(int pause)
-#else
-
-void simLoop()
-#endif
 {
 
     //new
