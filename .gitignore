@@ -11,6 +11,6 @@ CMakeFiles
 bin/main
 Testing/
 *.exe
-
+./*.txt
 
 
