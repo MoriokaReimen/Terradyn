@@ -13,6 +13,7 @@
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_//
 #include<cstdio>
 #include<cmath>
+#include <eigen3/Eigen/Core>
 
 #include"terradyn.hpp"
 
@@ -83,7 +84,7 @@ double calcSinkage(const double& roll, const double& h0, const double& y)
 
 
 /* Calculate lateral normal stress distribution *//////////////////////////////////
-double calc_sigma_inclined(const double& theta, const double& theta_f, const double& theta_r, const double& theta_m)
+double calcSigma(const double& theta, const double& theta_f, const double& theta_r, const double& theta_m)
 {
     double k_sigma;
 
@@ -104,9 +105,10 @@ double calc_sigma_inclined(const double& theta, const double& theta_f, const dou
 
 
 /* Calculate shear stresses *//////////////////////////////////////////////////////
-void calcTau(const double& s, const double& beta, const double& theta, const double& theta_f, const double& sigma, double tau[])
+Eigen::Vector3d calcTau(const double& s, const double& beta, const double& theta, const double& theta_f, const double& sigma)
 {
     double eta, ajt, ajl, j, jt, jl;
+    Eigen::Vector3d tau;
 
     // Soil slip angle
     ajt = 1-(1-s)*cos(theta);
@@ -119,9 +121,10 @@ void calcTau(const double& s, const double& beta, const double& theta, const dou
     j = sqrt(jt*jt + jl*jl);
 
     // Shear stresses
-    tau[0] = (SOIL_C + sigma*tan(SOIL_PHI))*(1-exp(-j/SOIL_K));	// tau_total
-    tau[1] = tau[0]*cos(eta);			// tau_t
-    tau[2] = tau[0]*sin(eta);			// tau_l
+    tau(0) = (SOIL_C + sigma*tan(SOIL_PHI))*(1-exp(-j/SOIL_K));	// tau_total
+    tau(1) = tau(0)*cos(eta);			// tau_t
+    tau(2) = tau(0)*sin(eta);			// tau_l
+    return tau;
 }
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -145,13 +148,13 @@ void calc_dFb(const double& s, const double& beta, const double& h, double dFb[]
         h_theta = w_rad*(cos(theta)-cos(theta_f));
 
         // Stresses
-        sigma = calc_sigma_inclined(theta, theta_f, theta_r, theta_m);
-        calcTau(s, beta, theta, theta_f, sigma, tau);
+        sigma = calcSigma(theta, theta_f, theta_r, theta_m);
+        auto tau = calcTau(s, beta, theta, theta_f, sigma);
 
-        dFx += tau[1]*cos(theta) - sigma*sin(theta);
-        dFy += tau[2];
-        dFz += tau[1]*sin(theta) + sigma*cos(theta);
-        dTz += tau[1];
+        dFx += tau(1)*cos(theta) - sigma*sin(theta);
+        dFy += tau(2);
+        dFz += tau(1)*sin(theta) + sigma*cos(theta);
+        dTz += tau(1);
     }
     dFb[0] = w_rad * dFx * DELTA_THETA;  // dFx [N/m]
     dFb[1] = w_rad * dFy * DELTA_THETA;  // dFy [N/m]
