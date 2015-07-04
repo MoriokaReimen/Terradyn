@@ -114,7 +114,7 @@ void vector_z( int n, double *a )
     for( i=0 ; i<n ; i++ )
         a[i] = 0.0;
 }
-
+/*
 void vector_z( int n, dReal *a )
 {
     int i;
@@ -122,6 +122,7 @@ void vector_z( int n, dReal *a )
     for( i=0 ; i<n ; i++ )
         a[i] = 0.0;
 }
+*/
 
 void vector_i( int n, double *a )
 {
@@ -130,7 +131,7 @@ void vector_i( int n, double *a )
     for( i=0 ; i<n ; i++ )
         a[i] = 1.0;
 }
-
+/*
 void vector_i( int n, dReal *a )
 {
     int i;
@@ -138,6 +139,7 @@ void vector_i( int n, dReal *a )
     for( i=0 ; i<n ; i++ )
         a[i] = 1.0;
 }
+*/
 
 void vector_scale( int n, double s, double *a, double *b )
 {

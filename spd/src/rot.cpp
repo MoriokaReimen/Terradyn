@@ -12,6 +12,7 @@
 #include <math.h>
 
 #include "../include/common.h"
+#include "../include/rot.h"
 
 #define _R(i,j) R[(i)*3+(j)]
 #define _R1(i,j) R1[(i)*3+(j)]
@@ -73,27 +74,29 @@ void R2rpy ( double *R, double *rpy )
         rpy[2] = atan2( _R(1,0)/co, _R(0,0)/co );
         rpy[0] = atan2( _R(2,1)/co, _R(2,2)/co);
     }
-
-    /*
-      double s2 = 0.0;
-      double c2 = 0.0;
-
-      if( ( fabs( _R(1,0) ) < 1e-15 ) && ( fabs( _R(0,0) ) < 1e-15 ) )
-      {
-      rpy[2] = 0.0;
-      rpy[1] = atan2( _R(2,0), _R(0,0) );
-      rpy[0] = atan2( _R(1,2), _R(1,1) );
-      }
-      else{
-
-      rpy[2] = atan2( -_R(1,0), _R(0,0) );
-      c2 = cos(rpy[2]);
-      s2 = sin(rpy[2]);
-      rpy[1] = atan2( _R(2,0), c2*_R(0,0)-s2*_R(1,0));
-      rpy[0] = atan2( -_R(2,1), _R(2,2) );
-      }
-    */
 }
+/*
+void R2rpy (dReal *R, dReal *rpy )
+{
+
+    double co=0.0;
+
+    rpy[1] = atan2( -_R(2,0),
+                    sqrt( _R(0,0)*_R(0,0) + _R(1,0)*_R(1,0) ));
+
+    if( rpy[1] == M_PI/2.0) {
+        rpy[2] = 0.0;
+        rpy[0] = atan2( _R(0,1), _R(1,1) );
+    } else if( rpy[1] == -M_PI/2.0) {
+        rpy[2] = 0.0;
+        rpy[0] = -atan2( _R(0,1), _R(1,1) );
+    } else {
+        co = cos( rpy[1] );
+        rpy[2] = atan2( _R(1,0)/co, _R(0,0)/co );
+        rpy[0] = atan2( _R(2,1)/co, _R(2,2)/co);
+    }
+}
+*/
 
 
 void R2q( double *R, double *q )

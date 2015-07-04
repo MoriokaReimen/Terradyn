@@ -16,8 +16,11 @@ D_CFLAGS = -DDRAWSTUFF
 #INLIBS = -I/usr/local/include -I/opt/X11R6/include
 
 #for LINUX(galileo)
-LDLIBS = -lm -L spd/lib -lspd -L/usr/local/lib -lode -ldrawstuff\
--lgsl -lgslcblas -lGL -lGLU
+LDLIBS = -lm -L spd/lib -lspd\
+-lGL -lGLU -lgsl -lgslcblas\
+-lX11 -lpthread\
+-L/usr/local/lib\
+-ldrawstuff -lode
 INLIBS = 
 
 

@@ -1,5 +1,9 @@
+#pragma once
+#include <ode/ode.h>
+
 void rpy2R ( double *, double * );
 void R2rpy ( double *, double * );
+void R2rpy ( dReal *, dReal * );
 void R2q ( double *, double * );
 void rpy2q ( double *, double * );
 
