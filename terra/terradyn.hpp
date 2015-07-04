@@ -2,7 +2,7 @@
 //
 // Terra mehcanics + Dynamics = Terra dyn
 // Header file
-// Toyoura sand definition file            
+// Toyoura sand definition file
 // g.ishigami [2007.11] ---> Yujiro [2012.11]
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_//
 
@@ -59,5 +59,5 @@ static double w_b_eff;		// Effective wheel width [m]
 double tInit_sinkage2(double, double);
 void   tCalc_Fe_positive2(double, double, double, double, double, double, double*, double);
 void   tCalc_Fe_negative2(double, double, double, double, double, double, double*, double);
-	
+
 #endif
