@@ -11,6 +11,19 @@ CMakeFiles
 bin/main
 Testing/
 *.exe
-./*.txt
+./run
+
+data.txt
+data_beta.txt
+data_fe.txt
+data_h.txt
+data_pos.txt
+data_pos_I.txt
+data_pos_link0.txt
+data_slip.txt
+get_position.txt
+get_rotation.txt
+link0_rotation_init.txt
+phi.txt
 
 
