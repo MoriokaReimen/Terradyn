@@ -1,8 +1,61 @@
 #include <iostream>
 using namespace std;
 #include <ode/ode.h>
+#include <list>
 #include "../include/define.h"
 #include "../include/common.h"
+struct Link
+{
+    // link
+    dBodyID link;
+    Vector6 link_pos;
+    Matrix3 link_R;
+    Matrix3 link_rR;
+    Vector4 link_q;
+
+    Vector3 link_vv;
+    Vector3 link_pre_vv;
+    Vector3 link_vd;
+
+    Vector3 link_ww;
+    Vector3 link_pre_ww;
+    Vector3 link_wd;
+
+    // link mass
+    dMass mass;
+    dReal link_M;
+    Matrix3 link_I;
+    Matrix3 link_I_fixed;
+};
+
+struct Joint
+{
+    // joint
+    dJointID joint;
+    Vector6 joint_pos;
+    Vector3 toJ;
+    Vector3 Jto;
+    Vector3 joint_axis;
+    dReal joint_param;
+    dReal joint_param_init;
+    dReal joint_param_vel;
+    dReal joint_param_pre_vel;
+    dReal joint_param_acc;
+
+    Vector6 end_pos;
+    Matrix3 end_R;
+    Matrix3 end_rR;
+    Vector3 toE;
+    Vector4 end_q;
+
+
+    double JJ_t;
+    double JJ_r;
+    double AA;
+    Matrix3 HH_w;
+    double HH_wq;
+    double HH_q;
+};
 
 class Model
 {
@@ -12,54 +65,9 @@ public:
     int *EE;
     int *J_type;
 
-    // link
-    dBodyID *link;
-    Vector6 *link_pos;
-    Matrix3 *link_R;
-    Matrix3 *link_rR;
-    Vector4 *link_q;
-
-    Vector3 *link_vv;
-    Vector3 *link_pre_vv;
-    Vector3 *link_vd;
-
-    Vector3 *link_ww;
-    Vector3 *link_pre_ww;
-    Vector3 *link_wd;
-
-    // link mass
-    dMass *mass;
-    dReal *link_M;
-    Matrix3 *link_I;
-    Matrix3 *link_I_fixed;
-
-    // joint
-    dJointID *joint;
-    Vector6 *joint_pos;
-    Vector3 *toJ;
-    Vector3 *Jto;
-    Vector3 *joint_axis;
-    dReal *joint_param;
-    dReal *joint_param_init;
-    dReal *joint_param_vel;
-    dReal *joint_param_pre_vel;
-    dReal *joint_param_acc;
-
-    Vector6 *end_pos;
-    Matrix3 *end_R;
-    Matrix3 *end_rR;
-    Vector3 *toE;
-    Vector4 *end_q;
 
 
-    double **JJ_t;
-    double **JJ_r;
-    double **AA;
-    Matrix3 HH_w;
-    double *HH_wq;
-    double *HH_q;
-
-    //_/_/_/     constructor of arrays for ODE      _/_/_//
+    //_/_/_/     constructor of list for ODE      _/_/_//
     void constructor()
     {
 
