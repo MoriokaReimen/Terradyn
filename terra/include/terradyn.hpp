@@ -34,6 +34,5 @@
 
 double tInit_sinkage(double);
 void   tCalc_Fe_positive(double, double, double, double, double, double, double*);
-void   tCalc_Fe_negative(double, double, double, double, double, double, double*);
 
 #endif
