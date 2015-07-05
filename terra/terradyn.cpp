@@ -19,50 +19,37 @@
 
 #define _USE_MATH_DEFINES
 
-double cot(const double& radian)
-{
-  return std::tan(M_PI_2 - radian);
-}
-
-double deg2rad(const double& degree)
-{
-  return degree*M_PI/180.0;
-}
-
-double rad2deg(const double& radian)
-{
-  return radian/M_PI*180.0;
-}
 
 
 const double Dz = 1.0;
 
 
 
-int sgn2(const double& val)
+
+struct Wheel
 {
-  if(val>0)
-    {   return  1;
-    }
-    else if(val<0)
-    {   return -1;
-    }
-    return 0;
-}
+  double w; // wheel width
+  double r; // wheel radius
+};
 
 
 /* Caclculate effective wheel width *//////////////////////////////////////////////
-void calcWidth(const double& roll, const double& h0)
+double calcWidth(const double& roll, const double& h0, const Wheel& wheel)
 {
+  double w;
   if(fabs(roll) < 0.01)
-    {   w_b_eff = w_b;
-    }
-    else
-    {   w_b_eff = h0*cot(roll) + w_b/2.0;
-        if(w_b_eff > w_b)
-        {   w_b_eff = w_b;
-        }
-    }
+  {
+    w = wheel.w;
+  }
+  else
+  {
+    w = h0*cot(roll) + wheel.w/2.0;
+  }
+  if(w > wheel.w)
+  {
+    w = wheel.w;
+  }
+    return w;
 }
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -167,28 +154,30 @@ void calc_dFb(const double& s, const double& beta, const double& h, double dFb[]
 
 /* Calculate Fxb, Fyb, Fzb, Tz, Tx *///////////////////////////////////////////////
 void calc_Fb(const double& s, const double& beta, const double& roll, const double& theta_f0, const double& theta_r0, double Fb[])
-{   double h0, h;
-    double y;
-    double dFb[5]= {};
+{
+  double h0, h;
+  double y;
+  double dFb[5]= {};
 
-    for(int i=0; i<5; i++)
-    {   dFb[i] = 0.0;
-    }
+  for(int i=0; i<5; i++)
+  {
+    dFb[i] = 0.0;
+  }
 
-    // Total sinkage at y=0
-    h0 = w_rad*(1-cos(theta_f0));
+  // Total sinkage at y=0
+  h0 = w_rad*(1-cos(theta_f0));
 
-    // Effective wheel width
-    calcWidth(roll, h0);
+  // Effective wheel width
+  calcWidth(roll, h0);
 
-    for(y=-w_b/2.0; y<=w_b/2.0; y+=DELTA_Y)
-    {   // Forces at position y
-        h = calcSinkage(roll, h0, y);
-        calc_dFb(s, beta, h, dFb);
-        for(int i=0; i<5; i++)
-        {   Fb[i] += dFb[i]*DELTA_Y; // Fxb, Fyb, Fzb, Tz, Tx
-        }
-    }
+  for(y=-w_b/2.0; y<=w_b/2.0; y+=DELTA_Y)
+  {   // Forces at position y
+      h = calcSinkage(roll, h0, y);
+      calc_dFb(s, beta, h, dFb);
+      for(int i=0; i<5; i++)
+      {   Fb[i] += dFb[i]*DELTA_Y; // Fxb, Fyb, Fzb, Tz, Tx
+      }
+  }
 }
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -294,7 +283,6 @@ void tCalc_Fe_positive2(const double& s, const double& beta, double theta_f0, do
     calc_Fb(s, fabs(beta), roll, theta_f0, theta_r0, Fb);
     //calc_Fs(s, delta, roll, theta_f0, Fs);
     fe[0] = Fb[0] + Fs[0];		// Fx
-    //fe[1] = Fb[1]*sgn2(-beta) + Fs[1];	// Fy
     fe[1] = Fb[1] + Fs[1];	// Fy
     fe[2] = Fb[2] + Fs[2] - Dz*vz;	// Fz
     fe[3] = Fb[3];			// Tz
