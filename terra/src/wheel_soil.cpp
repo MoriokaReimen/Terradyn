@@ -101,7 +101,7 @@ double WheelSoil::getSigma(const double& theta, const double& theta1, const doub
 }
 
 /*
-*    @brief Get the shear stress at any angle on the wheel
+*    @brief Get the shear stress at any angle on the wheel lateral direction
 *    @param [in] theta normal stress on the sheared surface
 *    @param [in] theta1 entry angle[radian]
 *    @param [in] theta2 exit angle[radian]
@@ -109,7 +109,7 @@ double WheelSoil::getSigma(const double& theta, const double& theta1, const doub
 *    @param [in] slip  slip ratio
 *    @return radial stress in the any region of the soil
 */
-double WheelSoil::getTau(const double& theta, const double& theta1, const double& theta2,
+double WheelSoil::getTau_x(const double& theta, const double& theta1, const double& theta2,
                          const double& theta_m, const double& slip) const
 {
     double tau {0.0};
@@ -132,7 +132,7 @@ double WheelSoil::getTau(const double& theta, const double& theta1, const double
 */
 double WheelSoil::getTorque( const double& theta1, const double& theta2, const double& theta_m, const double& slip) const
 {
-    auto tau_func = bind(&WheelSoil::getTau, this, _1, theta1, theta2, theta_m, slip);
+    auto tau_func = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
     double torque = wheel_.b * wheel_.r * wheel_.r * integrate(tau_func, theta1, theta2);
     return torque;
 }
@@ -151,7 +151,7 @@ double WheelSoil::getDrawbar(const double& theta1, const double& theta2, const d
     auto sigma_func = [&](double x) {
         return sigma_buff(x) * sin(x);
     };
-    auto tau_buff = bind(&WheelSoil::getTau, this, _1, theta1, theta2, theta_m, slip);
+    auto tau_buff = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
     auto tau_func = [&](double x) {
         return tau_buff(x) * cos(x);
     };

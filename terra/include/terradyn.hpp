@@ -14,11 +14,6 @@
 #define w_rad  0.055
 #define w_b    0.064
 
-/*#define K_flag 0
-#define k_c   0.0
-#define k_phi 3.48334*1000*1000*10
-#define n  1.703
-*/
 #define K_flag 1
 #define k_c   0.0
 #define k_phi 1203.54

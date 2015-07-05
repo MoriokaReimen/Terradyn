@@ -80,9 +80,8 @@ public:
     WheelSoil(const Soil& soil, const Wheel& wheel);
     double getSigma(const double& theta, const double& theta1, const double& theta2,
                     const double& theta_m) const;
-    double getTau(const double& theta, const double& theta1, const double& theta2,
+    double getTau_x(const double& theta, const double& theta1, const double& theta2,
                   const double& theta_m, const double& slip) const;
-    double getTraction(const double& theta1, const double& theta2, const double& theta_m, const double& slip) const;
     double getTorque(const double& theta1, const double& theta2, const double& theta_m, const double& slip) const;
     double getDrawbar(const double& theta1, const double& theta2, const double& theta_m, const double& slip) const;
 };

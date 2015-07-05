@@ -10,7 +10,7 @@
 #include<stdio.h>
 #include<math.h>
 
-#include"terradyn.h"
+#include"terradyn.hpp"
 
 #define sqr_f(x) x*x
 #define cot(x) 1/tan(x)
@@ -19,14 +19,14 @@
 
 static double Dz = 1.0;
 
-double calc_jx(double s, double theta_f, double theta)
+double calc_jx(double slip, double theta_f, double theta)
 {
-    return (w_rad*(theta_f - theta - (1.0-s) * (sin(theta_f) - sin(theta))));
+    return (w_rad*(theta_f - theta - (1.0-slip) * (sin(theta_f) - sin(theta))));
 }
 
-double calc_jy(double s, double theta_f, double theta, double beta)
+double calc_jy(double slip, double theta_f, double theta, double beta)
 {
-    return (w_rad * (1.0-s) * (theta_f-theta) * tan(beta));
+    return (w_rad * (1.0-slip) * (theta_f-theta) * tan(beta));
 }
 
 double calc_Rb(double H)
@@ -40,37 +40,27 @@ double calc_Rb(double H)
     D2 = cot(Xc) + ( pow(cot(Xc), 2) / cot(phi) );
     h0 = H*cot(Xc)/cot(phi);
     H += h0;
-    //*/
 
-    //ver_new 2005 11 16
-    /*  double i;
-    i = delta;
-    Xc = 45.0*M_PI/180.0 - 0.5*phi + 0.5*(i + asin( (sin(i)/sin(phi))) );
-    D1 = cot(Xc) + tan((Xc + phi - fabs(i) ));
-    D2 = cot(Xc) + ( pow(cot(Xc), 2) / cot((phi - fabs(i) )) );
-    h0 = H*cot(Xc)/cot(phi);
-    H += h0;
-    //*/
     return D1 * ( H*c + 0.5*rho* pow(H,2) * D2);
 }
 
-double calc_theta_t(double s)
+double calc_theta_t(double slip)
 {
     double a, b;
     a = 45.0*M_PI/180.0 - 0.5*phi;
-    b = 1.0/(1.0 - s);
+    b = 1.0/(1.0 - slip);
 
     return acos( (b + sqrt( sqr_f(b) + (1.0+sqr_f(a))*(sqr_f(a)-sqr_f(b)))) / (1+sqr_f(a)));
 }
 
-double calc_Kv(double s, double theta_f, double theta_t)
+double calc_Kv(double slip, double theta_f, double theta_t)
 {
-    return (1.0 / (1.0 - s)) * ( ((1.0-s)*(sin(theta_f)-sin(theta_t)) / (theta_f -theta_t)) -1.0 );
+    return (1.0 / (1.0 - slip)) * ( ((1.0-slip)*(sin(theta_f)-sin(theta_t)) / (theta_f -theta_t)) -1.0 );
 }
 
-double calc_jxf(double s, double theta_f, double theta, double Kv)
+double calc_jxf(double slip, double theta_f, double theta, double Kv)
 {
-    return w_rad*( (theta_f-theta)*(1.0+(1.0-s)*Kv) - (1.0-s)*(sin(theta_f)-sin(theta)) );
+    return w_rad*( (theta_f-theta)*(1.0+(1.0-slip)*Kv) - (1.0-slip)*(sin(theta_f)-sin(theta)) );
 }
 
 double tInit_sinkage(double W)
@@ -95,7 +85,6 @@ double tInit_sinkage(double W)
     d_theta = 0.001;
     e = 10000;
 
-    //while(fabs(e) > 0.0000001){
     while(fabs(e) > 0.01) {
 
         N=0.0;
@@ -133,12 +122,12 @@ double tInit_sinkage(double W)
 
         }
     }
-    printf("%lf\n",N);
+
     return theta_fc;
 }
 
 
-void tCalc_Fe_positive(double s, double beta, double theta_f, double theta_r,  double vz, double PHI, double *fe)
+void tCalc_Fe_positive(double slip, double beta, double theta_f, double theta_r,  double vz, double PHI, double *fe)
 {
     double i, K, Fx, Fu, Fs, Fz, H, Rb;
     double theta_m, d_theta, Tx, Ty, Tz;
@@ -176,7 +165,7 @@ void tCalc_Fe_positive(double s, double beta, double theta_f, double theta_r,  d
     d_theta = deg2rad(0.5);//0.00;
 
     // the angle of max stress
-    theta_m = (a_0 + a_1 * s) * theta_f;
+    theta_m = (a_0 + a_1 * slip) * theta_f;
 
     if(K_flag==0)
         //bekker
@@ -197,8 +186,8 @@ void tCalc_Fe_positive(double s, double beta, double theta_f, double theta_r,  d
 
         tau_max = (c + sigma*tan(phi));
 
-        jx = calc_jx(s, theta_f, i);
-        jy = calc_jy(s, theta_f, i, beta);
+        jx = calc_jx(slip, theta_f, i);
+        jy = calc_jy(slip, theta_f, i, beta);
 
         tau_x = tau_max * (1 - exp(-jx/kx));
         tau_y = tau_max * (1 - exp(-jy/ky));
@@ -223,8 +212,8 @@ void tCalc_Fe_positive(double s, double beta, double theta_f, double theta_r,  d
 
         tau_max = (c + sigma*tan(phi));
 
-        jx = calc_jx(s, theta_f, i);
-        jy = calc_jy(s, theta_f, i, beta);
+        jx = calc_jx(slip, theta_f, i);
+        jy = calc_jy(slip, theta_f, i, beta);
 
         tau_x = tau_max * (1 - exp(-jx/kx));
         tau_y = tau_max * (1 - exp(-jy/ky));
@@ -263,7 +252,7 @@ void tCalc_Fe_positive(double s, double beta, double theta_f, double theta_r,  d
 
 
 
-void tCalc_Fe_negative(double s, double beta, double theta_f, double theta_r,  double vz, double PHI, double *fe)
+void tCalc_Fe_negative(double slip, double beta, double theta_f, double theta_r,  double vz, double PHI, double *fe)
 {
     double i, K, Fx, Fu, Fs, Fz, H, Rb;
     double theta_m, d_theta, Tx, Ty, Tz;
@@ -302,7 +291,7 @@ void tCalc_Fe_negative(double s, double beta, double theta_f, double theta_r,  d
     d_theta = deg2rad(0.25);
 
     // the angle of max stress
-    theta_m = (a_0 + a_1 * s) * theta_f;
+    theta_m = (a_0 + a_1 * slip) * theta_f;
 
     K = (k_c / w_b + k_phi) * pow(w_rad,n);
 
@@ -311,16 +300,16 @@ void tCalc_Fe_negative(double s, double beta, double theta_f, double theta_r,  d
     kx = 0.05;
     ky = 0.03;
 
-    theta_t = calc_theta_t(s);
-    Kv = calc_Kv(s, theta_f, theta_t);
+    theta_t = calc_theta_t(slip);
+    Kv = calc_Kv(slip, theta_f, theta_t);
 
     for(i=theta_t; i<=theta_f; i+=d_theta) {
         sigma = K * pow( (cos(i) - cos(theta_f)), n);
 
         tau_max = (c + sigma*tan(phi));
 
-        jx = calc_jxf(s, theta_f, i, Kv);
-        jy = calc_jy(s, theta_f, i, beta);
+        jx = calc_jxf(slip, theta_f, i, Kv);
+        jy = calc_jy(slip, theta_f, i, beta);
 
         tau_x = tau_max * (1 - exp(-jx/kx));
         tau_y = tau_max * (1 - exp(-jy/ky));
@@ -341,8 +330,8 @@ void tCalc_Fe_negative(double s, double beta, double theta_f, double theta_r,  d
 
         tau_max = (c + sigma*tan(phi));
 
-        jx = calc_jx(s, theta_t, i);
-        jy = calc_jy(s, theta_f, i, beta);
+        jx = calc_jx(slip, theta_t, i);
+        jy = calc_jy(slip, theta_f, i, beta);
 
         tau_x = tau_max * (1 - exp(-jx/kx));
         tau_y = tau_max * (1 - exp(-jy/ky));
