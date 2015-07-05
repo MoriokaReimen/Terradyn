@@ -39,3 +39,5 @@
 
 double degToRad(const double& degree);
 double radToDeg(const double& radian);
+double cot(const double& radian);
+int sgn(const double& val);
