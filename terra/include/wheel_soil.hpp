@@ -36,6 +36,7 @@
 #pragma once
 #include<cmath>
 #include <functional>
+#include <eigen3/Eigen/Core>
 
 using std::function;
 
@@ -62,6 +63,7 @@ struct Wheel {
     double r {0.13};                   //! radius[m]
     double b {0.16};                   //! width[m]
     double w {135};                   //! vertical axle load[N]
+    Eigen::Vector3d velocity;
 };
 
 /*

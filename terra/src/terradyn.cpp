@@ -44,25 +44,6 @@ double calc_Rb(double H)
     return D1 * ( H*c + 0.5*rho* pow(H,2) * D2);
 }
 
-double calc_theta_t(double slip)
-{
-    double a, b;
-    a = 45.0*M_PI/180.0 - 0.5*phi;
-    b = 1.0/(1.0 - slip);
-
-    return acos( (b + sqrt( sqr_f(b) + (1.0+sqr_f(a))*(sqr_f(a)-sqr_f(b)))) / (1+sqr_f(a)));
-}
-
-double calc_Kv(double slip, double theta_f, double theta_t)
-{
-    return (1.0 / (1.0 - slip)) * ( ((1.0-slip)*(sin(theta_f)-sin(theta_t)) / (theta_f -theta_t)) -1.0 );
-}
-
-double calc_jxf(double slip, double theta_f, double theta, double Kv)
-{
-    return w_rad*( (theta_f-theta)*(1.0+(1.0-slip)*Kv) - (1.0-slip)*(sin(theta_f)-sin(theta)) );
-}
-
 double tInit_sinkage(double W)
 {
     double i, e, N, K_tmp;
