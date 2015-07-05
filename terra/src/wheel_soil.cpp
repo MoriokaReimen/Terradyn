@@ -123,6 +123,29 @@ double WheelSoil::getTau_x(const double& theta, const double& theta1, const doub
 }
 
 /*
+*    @brief Get the shear stress at any angle on the wheel lateral direction
+*    @param [in] theta normal stress on the sheared surface
+*    @param [in] theta1 entry angle[radian]
+*    @param [in] theta2 exit angle[radian]
+*    @param [in] theta_m angular position of the maximum radial stress[radian]
+*    @param [in] slip  slip ratio
+*    @param [in] beta  slip ratio
+*    @return radial stress in the any region of the soil
+*/
+double WheelSoil::getTau_y(const double& theta, const double& theta1, const double& theta2,
+                         const double& theta_m, const double& slip, const double& beta) const
+{
+    double tau {0.0};
+    if(theta >= theta2 && theta <= theta1) {
+        double sigma = getSigma(theta, theta1, theta2, theta_m);
+        double j = (wheel_.r * (1.0-slip) * (theta1-theta) * tan(beta));
+        tau = (soil_.c + sigma * tan(soil_.phi)) * (1.0 - exp(-j / soil_.K));
+
+    }
+    return tau;
+}
+
+/*
 *    @brief Get the Torque on the wheel
 *    @param [in] theta1 entry angle[radian]
 *    @param [in] theta2 exit angle[radian]
