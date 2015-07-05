@@ -6,288 +6,375 @@
 // G.Ishigami [2005.10]
 //       -add negative slip version Nov.15th
 //
-// modified by INO [2012.12]
-//       - extended to inclined wheels
-// modified by Kei [2015.7]
-//       - C++ 11
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_//
-#include<cstdio>
-#include<cmath>
-#include <eigen3/Eigen/Core>
+#include<stdio.h>
+#include<math.h>
 
-#include"terradyn.hpp"
+#include"terradyn.h"
 
-#define _USE_MATH_DEFINES
+#define sqr_f(x) x*x
+#define cot(x) 1/tan(x)
+#define deg2rad(x) x*M_PI/180.0
+#define rad2deg(x) x/M_PI*180.0
 
+static double Dz = 1.0;
 
-
-const double Dz = 1.0;
-
-
-
-
-struct Wheel
+double calc_jx(double s, double theta_f, double theta)
 {
-  double w; // wheel width
-  double r; // wheel radius
-};
-
-
-/* Caclculate effective wheel width *//////////////////////////////////////////////
-double calcWidth(const double& roll, const double& h0, const Wheel& wheel)
-{
-  double w;
-  if(fabs(roll) < 0.01)
-  {
-    w = wheel.w;
-  }
-  else
-  {
-    w = h0*cot(roll) + wheel.w/2.0;
-  }
-  if(w > wheel.w)
-  {
-    w = wheel.w;
-  }
-    return w;
+    return (w_rad*(theta_f - theta - (1.0-s) * (sin(theta_f) - sin(theta))));
 }
-///////////////////////////////////////////////////////////////////////////////////
 
-
-/* Calculate lateral sinkage distribution *////////////////////////////////////////
-double calcSinkage(const double& roll, const double& h0, const double& y)
+double calc_jy(double s, double theta_f, double theta, double beta)
 {
-    double h;
-    h = (y*tan(roll)+h0);
-    if (h > 0.0)
-    {   return h;
-    }
+    return (w_rad * (1.0-s) * (theta_f-theta) * tan(beta));
+}
+
+double calc_Rb(double H)
+{
+    double D1, D2;
+    double Xc;
+    double h0;
+
+    Xc = 45.0*M_PI/180.0 - 0.5*phi;
+    D1 = cot(Xc) + tan(Xc + phi);
+    D2 = cot(Xc) + ( pow(cot(Xc), 2) / cot(phi) );
+    h0 = H*cot(Xc)/cot(phi);
+    H += h0;
+    //*/
+
+    //ver_new 2005 11 16
+    /*  double i;
+    i = delta;
+    Xc = 45.0*M_PI/180.0 - 0.5*phi + 0.5*(i + asin( (sin(i)/sin(phi))) );
+    D1 = cot(Xc) + tan((Xc + phi - fabs(i) ));
+    D2 = cot(Xc) + ( pow(cot(Xc), 2) / cot((phi - fabs(i) )) );
+    h0 = H*cot(Xc)/cot(phi);
+    H += h0;
+    //*/
+    return D1 * ( H*c + 0.5*rho* pow(H,2) * D2);
+}
+
+double calc_theta_t(double s)
+{
+    double a, b;
+    a = 45.0*M_PI/180.0 - 0.5*phi;
+    b = 1.0/(1.0 - s);
+
+    return acos( (b + sqrt( sqr_f(b) + (1.0+sqr_f(a))*(sqr_f(a)-sqr_f(b)))) / (1+sqr_f(a)));
+}
+
+double calc_Kv(double s, double theta_f, double theta_t)
+{
+    return (1.0 / (1.0 - s)) * ( ((1.0-s)*(sin(theta_f)-sin(theta_t)) / (theta_f -theta_t)) -1.0 );
+}
+
+double calc_jxf(double s, double theta_f, double theta, double Kv)
+{
+    return w_rad*( (theta_f-theta)*(1.0+(1.0-s)*Kv) - (1.0-s)*(sin(theta_f)-sin(theta)) );
+}
+
+double tInit_sinkage(double W)
+{
+    double i, e, N, K_tmp;
+    double K,K_dush, integral, integral_dush;
+    double theta_fc, theta_r, high, low, d_theta;
+
+    if(K_flag==0)
+        // bekker
+        K_tmp = (k_c + k_phi * w_b) * pow(w_rad, (n+1));
     else
-    {
-      return 0.0;
-    }
-}
-///////////////////////////////////////////////////////////////////////////////////
+        // Reece
+        K_tmp = (c*k_c + rho*k_phi*w_b) * pow(w_rad, (n+1))/pow(w_b, (n-1));
 
+    K = K_tmp / ( pow(cos(alpha),n) * pow(cos(delta),(n-1)) );
+    K_dush = K_tmp* w_rad * fabs(sin(delta)) / pow(cos(delta),n);
 
-/* Calculate lateral normal stress distribution *//////////////////////////////////
-double calcSigma(const double& theta, const double& theta_f, const double& theta_r, const double& theta_m)
-{
-    double k_sigma;
-
-    // Normal stress coeffiecient
-    k_sigma = (SOIL_C*SOIL_KC+SOIL_GAMMA*w_b_eff*SOIL_KPHI)*pow(w_rad/w_b_eff, SOIL_N);
-
-    if((theta>=theta_m) && (theta<theta_f))
-    {   return k_sigma*pow(cos(theta)-cos(theta_f), SOIL_N);
-    }
-    else if((theta>theta_r) && (theta<theta_m))
-    {   return k_sigma*pow(cos(theta_f-(theta-theta_r)/(theta_m-theta_r)*(theta_f-theta_m))-cos(theta_f), SOIL_N);
-    }
-    else
-    {   return 0.0;
-    }
-}
-///////////////////////////////////////////////////////////////////////////////////
-
-
-/* Calculate shear stresses *//////////////////////////////////////////////////////
-Eigen::Vector3d calcTau(const double& s, const double& beta, const double& theta, const double& theta_f, const double& sigma)
-{
-    double eta, ajt, ajl, j, jt, jl;
-    Eigen::Vector3d tau;
-
-    // Soil slip angle
-    ajt = 1-(1-s)*cos(theta);
-    ajl = (1-s)*tan(beta);
-    eta = atan2(ajl, ajt);
-
-    // Soil deformation
-    jt = w_rad*((theta_f-theta) - (1-s)*(sin(theta_f)-sin(theta)));
-    jl = w_rad*(1-s)*(theta_f-theta)*tan(beta);
-    j = sqrt(jt*jt + jl*jl);
-
-    // Shear stresses
-    tau(0) = (SOIL_C + sigma*tan(SOIL_PHI))*(1-exp(-j/SOIL_K));	// tau_total
-    tau(1) = tau(0)*cos(eta);			// tau_t
-    tau(2) = tau(0)*sin(eta);			// tau_l
-    return tau;
-}
-///////////////////////////////////////////////////////////////////////////////////
-
-
-/* Calculate dFxb, dFyb, dFzb, dTz, dTx *//////////////////////////////////////////
-void calc_dFb(const double& s, const double& beta, const double& h, double dFb[])
-{   double theta_f, theta_r, theta_m;
-    double theta;
-    double h_theta;
-    double sigma, tau[3];
-    double dFx=0.0, dFy=0.0, dFz=0.0, dTz=0.0;
-
-    kappa = 2.1033*s*s - 1.9494*s + 0.8151;
-    theta_f = acos(1-h/w_rad);
-    theta_r = -acos(1-kappa*h/w_rad);
-    theta_m = (SOIL_A0+SOIL_A1*s)*theta_f;
-
-    // Integrands of dFx, dFy, dFz (trapezoid formula)
-    for (theta=theta_r; theta<=theta_f; theta += DELTA_THETA)
-    {   // Sinkage
-        h_theta = w_rad*(cos(theta)-cos(theta_f));
-
-        // Stresses
-        sigma = calcSigma(theta, theta_f, theta_r, theta_m);
-        auto tau = calcTau(s, beta, theta, theta_f, sigma);
-
-        dFx += tau(1)*cos(theta) - sigma*sin(theta);
-        dFy += tau(2);
-        dFz += tau(1)*sin(theta) + sigma*cos(theta);
-        dTz += tau(1);
-    }
-    dFb[0] = w_rad * dFx * DELTA_THETA;  // dFx [N/m]
-    dFb[1] = w_rad * dFy * DELTA_THETA;  // dFy [N/m]
-    dFb[2] = w_rad * dFz * DELTA_THETA;  // dFz [N/m]
-    dFb[3] = w_rad * w_rad * dTz * DELTA_THETA;  // dTz [(N*m)/m]
-    dFb[4] = w_rad * dFb[1] * theta_m;   // dTx [(N*m)/m]
-}
-///////////////////////////////////////////////////////////////////////////////////
-
-
-/* Calculate Fxb, Fyb, Fzb, Tz, Tx *///////////////////////////////////////////////
-void calc_Fb(const double& s, const double& beta, const double& roll, const double& theta_f0, const double& theta_r0, double Fb[])
-{
-  double h0, h;
-  double y;
-  double dFb[5]= {};
-
-  for(int i=0; i<5; i++)
-  {
-    dFb[i] = 0.0;
-  }
-
-  // Total sinkage at y=0
-  h0 = w_rad*(1-cos(theta_f0));
-
-  // Effective wheel width
-  calcWidth(roll, h0);
-
-  for(y=-w_b/2.0; y<=w_b/2.0; y+=DELTA_Y)
-  {   // Forces at position y
-      h = calcSinkage(roll, h0, y);
-      calc_dFb(s, beta, h, dFb);
-      for(int i=0; i<5; i++)
-      {   Fb[i] += dFb[i]*DELTA_Y; // Fxb, Fyb, Fzb, Tz, Tx
-      }
-  }
-}
-///////////////////////////////////////////////////////////////////////////////////
-
-
-/* Calculate initial sinkage at y=0 *//////////////////////////////////////////////
-double calcInitSinkage(const double& W, const double& roll)
-{
-    double N, e;
-    double K_tmp, K, K_dush, integral, integral_dush;
-    double theta_fc0, theta_fc, theta_r;
-    double h, h0;
-    double high, low;
-    double delta2;
-    int count=0;
-
-    theta_fc0 = 45.0 * M_PI / 180;
-    high = theta_fc0 * 2;
+    theta_fc = 45.0 * M_PI / 180;
+    high = theta_fc * 2;
     low = 0;
+    d_theta = 0.001;
     e = 10000;
-    delta2 = delta - roll;
 
-    while(fabs(e) > 0.01)
-    {
+    //while(fabs(e) > 0.0000001){
+    while(fabs(e) > 0.01) {
 
         N=0.0;
         integral = 0.0;
         integral_dush = 0.0;
+        theta_r = 2 * alpha - theta_fc;
 
-        h0 = w_rad*(1-cos(theta_fc0));
-        calcWidth(roll, h0);
+        for(i=theta_r+d_theta; i<theta_fc; i += d_theta) {
+            integral += pow( cos(i - alpha)-cos(theta_fc - alpha), n) * cos(i) * d_theta;
 
-        for(double y=-w_b/2.0; y<=w_b/2.0; y+=DELTA_Y)
-        {   h = calcSinkage(roll, h0, y);
-            theta_fc = acos(1-h/w_rad);
-            theta_r = 2 * alpha - theta_fc;
+            if(integral>100)
+                break;
 
-            K_tmp = (SOIL_C*SOIL_KC + SOIL_GAMMA*SOIL_KPHI*w_b_eff) * pow(w_rad, (SOIL_N+1))/pow(w_b_eff, SOIL_N);
-            K = K_tmp / ( pow(cos(alpha),SOIL_N) * pow(cos(delta2),(SOIL_N-1)) );
-
-            for(double theta=theta_r+DELTA_THETA; theta<theta_fc; theta += DELTA_THETA)
-            {   integral += pow( cos(theta - alpha)-cos(theta_fc - alpha), SOIL_N) * cos(theta);
-                //if(integral>100) {break;}
-            }
-        }
-        N = K * integral * DELTA_THETA * DELTA_Y;
-
-        if(fabs(delta2) > 0.01)
-        {   if(roll > 0)
-            {   h = calcSinkage(roll, h0, -w_b/2.0);
-            }
-            else
-            {   h = calcSinkage(roll, h0, w_b/2.0);
-            }
-            theta_fc = acos(1-h/w_rad);
-            theta_r = 2*alpha - theta_fc;
-            for(double theta=theta_r+DELTA_THETA; theta<theta_fc; theta += DELTA_THETA)
-            {   integral_dush += pow((cos(theta - alpha) - cos(theta_fc - alpha)) , SOIL_N) * pow(sin(theta-alpha),2);
-            }
-            K_dush = K_tmp * w_rad * fabs(sin(delta2)) / pow(cos(delta2),SOIL_N);
-            N += K_dush * integral_dush * DELTA_THETA;
+            if(delta != 0.0)
+                integral_dush += pow((cos(i - alpha) - cos(theta_fc - alpha)) , n) * pow(sin(i-alpha),2) * d_theta;
         }
 
-        //e = W * cos(alpha) * cos(alpha) - N; // why multiplying by cos^2?
-        e = W - N;
+        N = K * integral;
 
-        if(e > 0.0)
-        {   low = theta_fc0;
-            theta_fc0 = (theta_fc0 + high) / 2;
-            if(theta_fc0 > deg2rad(90))
-                theta_fc0 = deg2rad(89);
+        if(delta != 0)
+            N = N + K_dush * integral_dush;
+
+        e = W * cos(alpha) * cos(alpha) - N;
+
+        if(e > 0.0) {
+            low = theta_fc;
+            theta_fc = (theta_fc + high) / 2;
+            if(theta_fc > deg2rad(90))
+                theta_fc = deg2rad(89);
+        } else {
+            high = theta_fc;
+            theta_fc = (theta_fc + low) / 2;
+            if(theta_fc < 0.0)
+                theta_fc = 0.0;
+
         }
-        else
-        {   high = theta_fc0;
-            theta_fc0 = (theta_fc0 + low) / 2;
-            if(theta_fc0 < 0.0)
-                theta_fc0 = 0.0;
-        }
-        count++;
-        //if(count > MAX_CALC) {break;}
     }
-    return theta_fc0;
+    printf("%lf\n",N);
+    return theta_fc;
 }
-///////////////////////////////////////////////////////////////////////////////////
 
 
-/* Calculate wheel forces *////////////////////////////////////////////////////////
-void tCalc_Fe_positive2(const double& s, const double& beta, double theta_f0, double theta_r0,
-                        const double& vz, const double& PHI, double *fe, const double& roll)
-{   double Fb[5]= {}, Fs[3]= {};
+void tCalc_Fe_positive(double s, double beta, double theta_f, double theta_r,  double vz, double PHI, double *fe)
+{
+    double i, K, Fx, Fu, Fs, Fz, H, Rb;
+    double theta_m, d_theta, Tx, Ty, Tz;
+    double sigma, tau_x, tau_y, tau_max, jx, jy;
+    double kx, ky;
 
-    for(int i=0; i<5; i++)
-    {   fe[i] = 0.0;
-        Fb[i] = 0.0;
-        if(i<3)
-        {   Fs[i]=0.0;
-        }
-    }
+    Fz = 0.0;
+    Fx = 0.0;
+    Fu = 0.0;
+    Fs = 0.0;
+
+    Tx = 0.0;
+    Ty = 0.0;
+    Tz = 0.0;
+
+    sigma = 0.0;
+    tau_x = 0.0;
+    tau_y = 0.0;
+
+    jx = 0.0;
+    jy = 0.0;
+
+    H  = 0.0;
+    Rb = 0.0;
+
+    fe[0] = 0.0;
+    fe[1] = 0.0;
+    fe[2] = 0.0;
+    fe[3] = 0.0;
+    fe[4] = 0.0;
 
     // adapt theta into ground coordinate
-    theta_f0 -= PHI;
-    theta_r0 -= PHI;
+    theta_f -= PHI;
+    theta_r -= PHI;
+    d_theta = deg2rad(0.5);//0.00;
 
-    calc_Fb(s, fabs(beta), roll, theta_f0, theta_r0, Fb);
-    //calc_Fs(s, delta, roll, theta_f0, Fs);
-    fe[0] = Fb[0] + Fs[0];		// Fx
-    fe[1] = Fb[1] + Fs[1];	// Fy
-    fe[2] = Fb[2] + Fs[2] - Dz*vz;	// Fz
-    fe[3] = Fb[3];			// Tz
-    fe[4] = Fb[4];			// Tx
+    // the angle of max stress
+    theta_m = (a_0 + a_1 * s) * theta_f;
+
+    if(K_flag==0)
+        //bekker
+        K = (k_c / w_b + k_phi) * pow(w_rad,n);
+    else
+        //reece
+        K = (c*k_c + rho*k_phi*w_b) * pow(w_rad/w_b, n);
+
+    beta = fabs(beta);
+    if(beta>deg2rad(45))
+        beta  = deg2rad(45);
+
+    kx =  -0.0073*beta*beta - 0.0403*beta + 0.07;
+    ky = 0.0306667;
+
+    for(i=theta_m; i<=theta_f; i+=d_theta) {
+        sigma = K * pow( (cos(i) - cos(theta_f)), n);
+
+        tau_max = (c + sigma*tan(phi));
+
+        jx = calc_jx(s, theta_f, i);
+        jy = calc_jy(s, theta_f, i, beta);
+
+        tau_x = tau_max * (1 - exp(-jx/kx));
+        tau_y = tau_max * (1 - exp(-jy/ky));
+
+        Fz += (sigma * cos(i) * d_theta + tau_x * sin(i) * d_theta);
+        Fx += (tau_x * cos(i) * d_theta - sigma * sin(i) * d_theta);
+
+        H = w_rad * (cos(i) - cos(theta_f));
+        Rb = calc_Rb(H);
+
+        Fu += (tau_y * d_theta);
+        Fs += (Rb*(w_rad - H*cos(i))*d_theta);
+
+        Tz += (tau_x * d_theta);
+    }
+    for(i=theta_r; i<theta_m; i+=d_theta) {
+
+        sigma = K * pow(cos(theta_f - (i-theta_r)/(theta_m-theta_r)*(theta_f-theta_m)) - cos(theta_f), n);
+
+        if( (cos(theta_f - (i-theta_r)/(theta_m-theta_r)*(theta_f-theta_m)) - cos(theta_f)) < -0.1)
+            printf("ARG is negative!! \n");
+
+        tau_max = (c + sigma*tan(phi));
+
+        jx = calc_jx(s, theta_f, i);
+        jy = calc_jy(s, theta_f, i, beta);
+
+        tau_x = tau_max * (1 - exp(-jx/kx));
+        tau_y = tau_max * (1 - exp(-jy/ky));
+
+        Fz += (sigma * cos(i) * d_theta + tau_x * sin(i) * d_theta);
+        Fx += (tau_x * cos(i) * d_theta - sigma * sin(i) * d_theta);
+
+        H = w_rad * (cos(i) - cos(theta_f));
+        Rb = calc_Rb(H);
+
+        Fu += (tau_y * d_theta);
+        Fs += (Rb*(w_rad - H*cos(i))*d_theta);
+
+        Tz += tau_x * d_theta;
+    }
+
+    Fx *= (w_rad * w_b);
+    Fu *= (w_rad * w_b);
+    Fz *= (w_rad * w_b);
+    Tz *= (w_rad * w_rad * w_b);
+
+    fe[0] = Fx - Fs*sin(beta)*cos(beta);
+    fe[1] = Fu + Fs*sin(beta)*sin(beta);
+
+    fe[2] = Fz - Dz*vz;
+    fe[3] = Tz;
+    fe[4] = fe[1] * w_rad*sin(theta_m);
+
+    Fz = 0.0;
+    Fx = 0.0;
+    Fu = 0.0;
+    Fs = 0.0;
+    Tz = 0.0;
+
 }
-///////////////////////////////////////////////////////////////////////////////////
 
 
+
+void tCalc_Fe_negative(double s, double beta, double theta_f, double theta_r,  double vz, double PHI, double *fe)
+{
+    double i, K, Fx, Fu, Fs, Fz, H, Rb;
+    double theta_m, d_theta, Tx, Ty, Tz;
+    double sigma, tau_x, tau_y, tau_max, jx, jy;
+    double kx,ky;
+    double theta_t,Kv;
+
+    Fz = 0.0;
+    Fx = 0.0;
+    Fu = 0.0;
+    Fs = 0.0;
+
+    Tx = 0.0;
+    Ty = 0.0;
+    Tz = 0.0;
+
+    sigma = 0.0;
+    tau_x = 0.0;
+    tau_y = 0.0;
+
+    jx = 0.0;
+    jy  = 0.0;
+
+    H  = 0.0;
+    Rb = 0.0;
+
+    fe[0] = 0.0;
+    fe[1] = 0.0;
+    fe[2] = 0.0;
+    fe[3] = 0.0;
+    fe[4] = 0.0;
+
+    // adapt theta into ground coordinate
+    theta_f -= PHI;
+    theta_r -= PHI;
+    d_theta = deg2rad(0.25);
+
+    // the angle of max stress
+    theta_m = (a_0 + a_1 * s) * theta_f;
+
+    K = (k_c / w_b + k_phi) * pow(w_rad,n);
+
+    beta = fabs(beta);
+
+    kx = 0.05;
+    ky = 0.03;
+
+    theta_t = calc_theta_t(s);
+    Kv = calc_Kv(s, theta_f, theta_t);
+
+    for(i=theta_t; i<=theta_f; i+=d_theta) {
+        sigma = K * pow( (cos(i) - cos(theta_f)), n);
+
+        tau_max = (c + sigma*tan(phi));
+
+        jx = calc_jxf(s, theta_f, i, Kv);
+        jy = calc_jy(s, theta_f, i, beta);
+
+        tau_x = tau_max * (1 - exp(-jx/kx));
+        tau_y = tau_max * (1 - exp(-jy/ky));
+
+        Fz += (sigma * cos(i) * d_theta + tau_x * sin(i) * d_theta);
+        Fx += (tau_x * cos(i) * d_theta - sigma * sin(i) * d_theta);
+
+        H = w_rad * (cos(i) - cos(theta_f));
+        Rb = calc_Rb(H);
+
+        Fu += (tau_y * d_theta);
+        Fs += (Rb*(w_rad - H*cos(i))*d_theta);
+
+        Tz += (tau_x * d_theta);
+    }
+    for(i=theta_r; i<theta_t; i+=d_theta) {
+        sigma = K * pow(cos(theta_f - (i-theta_r)/(theta_m-theta_r)*(theta_f-theta_m)) - cos(theta_f), n);
+
+        tau_max = (c + sigma*tan(phi));
+
+        jx = calc_jx(s, theta_t, i);
+        jy = calc_jy(s, theta_f, i, beta);
+
+        tau_x = tau_max * (1 - exp(-jx/kx));
+        tau_y = tau_max * (1 - exp(-jy/ky));
+
+        Fz += (sigma * cos(i) * d_theta + tau_x * sin(i) * d_theta);
+        Fx += (tau_x * cos(i) * d_theta - sigma * sin(i) * d_theta);
+
+        H = w_rad * (cos(i) - cos(theta_f));
+        Rb = calc_Rb(H);
+
+        Fu += (tau_y * d_theta);
+        Fs += (Rb*(w_rad - H*cos(i))*d_theta);
+
+        Tz += tau_x * d_theta;
+    }
+
+    Fx *= (w_rad * w_b);
+    Fu *= (w_rad * w_b);
+    Fz *= (w_rad * w_b);
+    Tz *= (w_rad * w_rad * w_b);
+
+    fe[0] = Fx - Fs*sin(beta)*cos(beta);
+    fe[1] = Fu + Fs*sin(beta)*sin(beta);
+
+    fe[2] = Fz - Dz*vz;
+    fe[3] = Tz;
+    fe[4] = fe[1] * w_rad*sin(theta_m);
+
+    Fz = 0.0;
+    Fx = 0.0;
+    Fu = 0.0;
+    Fs = 0.0;
+    Tz = 0.0;
+
+}
