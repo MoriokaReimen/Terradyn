@@ -182,3 +182,35 @@ double WheelSoil::getDrawbar(const double& theta1, const double& theta2, const d
     double drawbar = wheel_.r * wheel_.b * (integrate(tau_func, theta1, theta2) - integrate(sigma_func, theta1, theta2));
     return drawbar;
 }
+
+Eigen::Vector3d WheelSoil::getForce(double slip, double theta1, double theta2) const
+{
+    Eigen::Vector3d force;
+    double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), degToRad(45));
+    double fx, fy, fz;
+    double theta_m = (soil_.a0 + soil_.a1 * slip) * theta1;
+
+    auto tau_x_buff = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
+    auto tau_y_buff = bind(&WheelSoil::getTau_y, this, _1, theta1, theta2, theta_m, slip, beta);
+    auto sigma_buff = bind(&WheelSoil::getSigma, this, _1, theta1, theta2, theta_m);
+
+    auto fx_func = [&](double x) {
+        return tau_x_buff(x) * cos(x) - sigma_buff(x) * sin(x);
+    };
+    auto fy_func = [&](double x) {
+        return tau_y_buff(x);
+    };
+    auto fz_func = [&](double x) {
+        return sigma_buff(x) * cos(x) + tau_x_buff(x) * sin(x);
+    };
+
+    fx = (wheel_.r * wheel_.b) * integrate(fx_func, theta1, theta2);
+    fy = (wheel_.r * wheel_.b) * integrate(fy_func, theta1, theta2);
+    fz = (wheel_.r * wheel_.b) * integrate(fz_func, theta1, theta2);
+
+    force(0) = fx;
+    force(1) = fy;
+    force(2) = fz - soil_.d * wheel_.velocity(2);
+
+    return force;
+}

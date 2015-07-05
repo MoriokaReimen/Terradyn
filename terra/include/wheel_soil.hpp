@@ -38,6 +38,8 @@
 #include <functional>
 #include <eigen3/Eigen/Core>
 
+#include "angle.hpp"
+
 using std::function;
 
 /*
@@ -52,6 +54,9 @@ struct Soil {
     double k2 {0.0};                   //! pressure sinkage modulus 2
     double n {0.89};                  //! exponent of sinkage to width ratio
     double gamma {0.0575};            //! density[N/m^3]
+    double d{1.0}; // sink constant[m/]
+    double a0{0.4}; // max sigma angle constant1
+    double a1{0.15}; //max sigma angle constant2
 };
 
 /*
@@ -87,5 +92,6 @@ public:
     double getTorque(const double& theta1, const double& theta2, const double& theta_m, const double& slip) const;
     double getDrawbar(const double& theta1, const double& theta2, const double& theta_m, const double& slip) const;
     double getTau_y(const double& theta, const double& theta1, const double& theta2, const double& theta_m, const double& slip, const double& beta) const;
+    Eigen::Vector3d getForce(double slip, double theta1, double theta2) const;
 };
 

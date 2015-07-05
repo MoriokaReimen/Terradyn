@@ -108,8 +108,9 @@ double tInit_sinkage(double W)
 }
 
 
-void tCalc_Fe_positive(double slip, double beta, double theta_f, double theta_r,  double vz, double PHI, double *fe)
+void getForce(double slip, double theta_f, double theta_r,  double vz, double PHI, double *fe)
 {
+  double beta;
     double i, K, Fx, Fu, Fs, Fz, H, Rb;
     double theta_m, d_theta, Tx, Ty, Tz;
     double sigma, tau_x, tau_y, tau_max, jx, jy;
