@@ -34,7 +34,6 @@
 -----------------------------------------------------------------------------
 */
 #include "wheel_soil.hpp"
-#include "intdiff.hpp"
 
 using std::cos;
 using std::sin;

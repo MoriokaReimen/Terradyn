@@ -39,6 +39,7 @@
 #include <eigen3/Eigen/Core>
 
 #include "angle.hpp"
+#include "gsl.hpp"
 
 using std::function;
 

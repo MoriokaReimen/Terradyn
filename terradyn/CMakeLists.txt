@@ -8,7 +8,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -fPIC")
 
 set(SRC
 src/angle.cpp
-src/intdiff.cpp
+src/gsl.cpp
 src/terradyn.cpp
 src/wheel_soil.cpp
 )
