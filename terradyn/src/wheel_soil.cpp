@@ -244,8 +244,8 @@ Eigen::Vector3d WheelSoil::getTorque(double slip, double theta1, double theta2) 
         return tau_y_buff(x);
     };
 
-    torque(0) = (wheel_.r * wheel_.r * wheel_.b) * integrate(tau_x, theta1, theta2);
-    torque(1) = wheel_.r * wheel_.b * integrate(tau_y, theta1, theta2) * wheel_.r * sin(theta_m);
+    torque(0) = wheel_.r * wheel_.r * wheel_.b * integrate(tau_y, theta1, theta2) * sin(theta_m);
+    torque(1) = wheel_.r * wheel_.r * wheel_.b * integrate(tau_x, theta1, theta2);
     torque(2) = 0;
 
     return torque;
