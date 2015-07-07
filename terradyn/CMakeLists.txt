@@ -13,5 +13,12 @@ src/terradyn.cpp
 src/wheel_soil.cpp
 )
 
-add_library(terradyn  STATIC ${SRC}
+add_library(terradyn  STATIC ${SRC})
+
+set(TEST_SRC
+test/main.cpp
+test/test-gsl.cpp
 )
+add_executable(test-terradyn ${SRC} ${TEST_SRC})
+target_link_libraries(test-terradyn gtest gsl gslcblas pthread)
+
