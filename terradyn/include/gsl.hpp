@@ -36,7 +36,11 @@
 #pragma once
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_deriv.h>
+#include <gsl/gsl_roots.h>
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_math.h>
 #include<functional>
+#include<exception>
 using std::function;
 
 double integrate(function<double(double)> func, double start, double end, double max_error = 1e-7);
