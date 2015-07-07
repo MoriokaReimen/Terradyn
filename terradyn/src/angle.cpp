@@ -41,7 +41,7 @@
 *    @param [in] degree angle in degree
 *    @return angle in radian
 */
-double degToRad(const double& degree)
+double toRadian(const double& degree)
 {
     return degree * M_PI / 180.0;
 }
@@ -51,7 +51,7 @@ double degToRad(const double& degree)
 *    @param [in] radian angle in radian
 *    @return angle in degree
 */
-double radToDeg(const double& radian)
+double toDegree(const double& radian)
 {
     return radian * 180.0 / M_PI;
 }

@@ -37,7 +37,7 @@
 #include <cmath>
 #define _USE_MATH_DEFINES
 
-double degToRad(const double& degree);
-double radToDeg(const double& radian);
+double toRadian(const double& degree);
+double toDegree(const double& radian);
 double cot(const double& radian);
 int sgn(const double& val);

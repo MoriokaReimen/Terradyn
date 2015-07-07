@@ -269,6 +269,6 @@ double WheelSoil::getTheta_m(const double& slip, const double& theta1) const
 */
 double WheelSoil::getBeta() const
 {
-    double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), degToRad(45));
+    double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), toRadian(45));
     return beta;
 }
