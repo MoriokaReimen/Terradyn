@@ -90,9 +90,10 @@ public:
                     const double& theta_m) const;
     double getTau_x(const double& theta, const double& theta1, const double& theta2,
                   const double& theta_m, const double& slip) const;
-    double getTorque(const double& theta1, const double& theta2, const double& theta_m, const double& slip) const;
+    double getWheelTorque(const double& theta1, const double& theta2, const double& theta_m, const double& slip) const;
     double getDrawbar(const double& theta1, const double& theta2, const double& theta_m, const double& slip) const;
     double getTau_y(const double& theta, const double& theta1, const double& theta2, const double& theta_m, const double& slip, const double& beta) const;
     Eigen::Vector3d getForce(double slip, double theta1, double theta2) const;
+    Eigen::Vector3d getTorque(double slip, double theta1, double theta2) const;
 };
 

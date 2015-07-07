@@ -152,7 +152,7 @@ double WheelSoil::getTau_y(const double& theta, const double& theta1, const doub
 *    @param [in] slip  slip ratio
 *    @return radial stress in the any region of the soil
 */
-double WheelSoil::getTorque( const double& theta1, const double& theta2, const double& theta_m, const double& slip) const
+double WheelSoil::getWheelTorque( const double& theta1, const double& theta2, const double& theta_m, const double& slip) const
 {
     auto tau_func = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
     double torque = wheel_.b * wheel_.r * wheel_.r * integrate(tau_func, theta1, theta2);
@@ -182,6 +182,13 @@ double WheelSoil::getDrawbar(const double& theta1, const double& theta2, const d
     return drawbar;
 }
 
+/*
+*    @brief Get the Force on the wheel
+*    @param [in] slip  slip ratio
+*    @param [in] theta1 entry angle[radian]
+*    @param [in] theta2 exit angle[radian]
+*    @return force vector on the wheel
+*/
 Eigen::Vector3d WheelSoil::getForce(double slip, double theta1, double theta2) const
 {
     Eigen::Vector3d force;
@@ -212,4 +219,34 @@ Eigen::Vector3d WheelSoil::getForce(double slip, double theta1, double theta2) c
     force(2) = fz - soil_.d * wheel_.velocity(2);
 
     return force;
+}
+
+/*
+*    @brief Get the Torque on the wheel
+*    @param [in] slip  slip ratio
+*    @param [in] theta1 entry angle[radian]
+*    @param [in] theta2 exit angle[radian]
+*    @return torque vector on the wheel
+*/
+Eigen::Vector3d WheelSoil::getTorque(double slip, double theta1, double theta2) const
+{
+    Eigen::Vector3d torque;
+
+    double theta_m = (soil_.a0 + soil_.a1 * slip) * theta1;
+    double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), degToRad(45));
+
+    auto tau_x_buff = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
+    auto tau_y_buff = bind(&WheelSoil::getTau_y, this, _1, theta1, theta2, theta_m, slip, beta);
+    auto  tau_x = [&](double x) {
+        return tau_x_buff(x);
+    };
+    auto  tau_y = [&](double x) {
+        return tau_y_buff(x);
+    };
+
+    torque(0) = (wheel_.r * wheel_.r * wheel_.b) * integrate(tau_x, theta1, theta2);
+    torque(1) = wheel_.r * wheel_.b * integrate(tau_y, theta1, theta2) * wheel_.r * sin(theta_m);
+    torque(2) = 0;
+
+    return torque;
 }
