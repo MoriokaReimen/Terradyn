@@ -192,9 +192,9 @@ double WheelSoil::getDrawbar(const double& theta1, const double& theta2, const d
 Eigen::Vector3d WheelSoil::getForce(double slip, double theta1, double theta2) const
 {
     Eigen::Vector3d force;
-    double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), degToRad(45));
+    double beta = this->getBeta();
     double fx, fy, fz;
-    double theta_m = (soil_.a0 + soil_.a1 * slip) * theta1;
+    double theta_m = this->getTheta_m(slip, theta1);
 
     auto tau_x_buff = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
     auto tau_y_buff = bind(&WheelSoil::getTau_y, this, _1, theta1, theta2, theta_m, slip, beta);
@@ -232,8 +232,8 @@ Eigen::Vector3d WheelSoil::getTorque(double slip, double theta1, double theta2) 
 {
     Eigen::Vector3d torque;
 
-    double theta_m = (soil_.a0 + soil_.a1 * slip) * theta1;
-    double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), degToRad(45));
+    double theta_m = this->getTheta_m(slip, theta1);
+    double beta = this->getBeta();
 
     auto tau_x_buff = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
     auto tau_y_buff = bind(&WheelSoil::getTau_y, this, _1, theta1, theta2, theta_m, slip, beta);
@@ -244,9 +244,31 @@ Eigen::Vector3d WheelSoil::getTorque(double slip, double theta1, double theta2) 
         return tau_y_buff(x);
     };
 
-    torque(0) = wheel_.r * wheel_.r * wheel_.b * integrate(tau_y, theta1, theta2) * sin(theta_m);
+    torque(0) = 0;
     torque(1) = wheel_.r * wheel_.r * wheel_.b * integrate(tau_x, theta1, theta2);
-    torque(2) = 0;
+    torque(2) = wheel_.r * wheel_.r * wheel_.b * integrate(tau_y, theta1, theta2) * sin(theta_m); // self aligning torque
 
     return torque;
+}
+
+/*
+*    @brief Get theta_m
+*    @param [in] slip slip ratio
+*    @param [in] theta1 entry angle[radian]
+*    @return angle at max sigma[radian]
+*/
+double WheelSoil::getTheta_m(double slip, double theta1) const
+{
+    double theta_m = (soil_.a0 + soil_.a1 * slip) * theta1;
+    return theta_m;
+}
+
+/*
+*    @brief Get beta
+*    @return slip angle[radian]
+*/
+double WheelSoil::getBeta() const
+{
+    double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), degToRad(45));
+    return beta;
 }
