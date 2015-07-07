@@ -45,3 +45,5 @@ using std::function;
 
 double integrate(function<double(double)> func, double start, double end, double max_error = 1e-7);
 double differentiate(function<double(double)> func, double x, double max_error = 1e-7);
+double find_root(function<double(double)> func);
+double find_root(function<double(double)> func, double y);
