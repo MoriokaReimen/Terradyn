@@ -257,7 +257,7 @@ Eigen::Vector3d WheelSoil::getTorque(double slip, double theta1, double theta2) 
 *    @param [in] theta1 entry angle[radian]
 *    @return angle at max sigma[radian]
 */
-double WheelSoil::getTheta_m(double slip, double theta1) const
+double WheelSoil::getTheta_m(const double& slip, const double& theta1) const
 {
     double theta_m = (soil_.a0 + soil_.a1 * slip) * theta1;
     return theta_m;
