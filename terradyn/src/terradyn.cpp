@@ -181,8 +181,6 @@ void tCalc_Fe_positive(double s, double beta, double theta_f, double theta_r,  d
     K = (k_c / w_b + k_phi) * pow(w_rad,n);
 
     beta = fabs(beta);
-    if(beta>deg2rad(45))
-        beta  = deg2rad(45);
 
     kx =  -0.0073*beta*beta - 0.0403*beta + 0.07;
     ky = 0.0306667;

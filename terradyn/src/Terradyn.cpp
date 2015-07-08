@@ -143,9 +143,9 @@ double Terradyn::getTau_y(const double& theta, const double& theta1, const doubl
     if(theta >= theta2 && theta <= theta1) {
         double jy = (wheel_.r * (1.0-slip) * (theta1-theta) * tan(beta));
         if(std::isinf(jy))
-            tau = tau_max * (1.0 - exp(-jy / ky));
-        else
             tau = tau_max;
+        else
+            tau = tau_max * (1.0 - exp(-jy / ky));
     }
     return tau;
 }
