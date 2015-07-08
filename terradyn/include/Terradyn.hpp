@@ -55,7 +55,6 @@ struct Soil {
     double k_c{0.0};
     double k_phi{1203.54};
     double n {1.0};                  //! exponent of sinkage to width ratio
-    double gamma {0.0575};            //! density[N/m^3]
     double d{1.0}; // sink constant[m/]
     double a0{0.4}; // max sigma angle constant1
     double a1{0.15}; //max sigma angle constant2
@@ -97,5 +96,7 @@ public:
     Eigen::Vector3d getTorque(double slip, double theta1, double theta2) const;
     double getTheta_m(const double& slip, const double& theta1) const;
     double getBeta() const;
+    double getTau_max(const double& theta, const double& theta1, const double& theta2,
+                    const double& theta_m) const;
 };
 

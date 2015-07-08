@@ -272,7 +272,18 @@ double Terradyn::getTheta_m(const double& slip, const double& theta1) const
 */
 double Terradyn::getBeta() const
 {
-    //double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), toRadian(45));
     double beta = fabs(asin(wheel_.velocity(1) / wheel_.velocity(0)));
     return beta;
+}
+
+/*
+*    @brief Get Tau_max
+*    @return max shearing force on the wheel
+*/
+double Terradyn::getTau_max(const double& theta, const double& theta1, const double& theta2,
+                const double& theta_m) const
+{
+    double sigma = getSigma(theta, theta1, theta2, theta_m);
+    double tau_max = (soil_.c + sigma * tan(soil_.phi));
+    return tau_max;
 }
