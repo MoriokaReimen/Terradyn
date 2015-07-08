@@ -63,7 +63,7 @@ double toDegree(const double& radian)
 */
 double cot(const double& radian)
 {
-  return std::tan(M_PI_2 - radian);
+    return std::tan(M_PI_2 - radian);
 }
 
 /*
@@ -72,14 +72,11 @@ double cot(const double& radian)
 */
 int sgn(const double& val)
 {
-  if(val>0)
-  {
-    return  1;
-  }
-  else if(val<0)
-  {
-    return -1;
-  }
+    if(val>0) {
+        return  1;
+    } else if(val<0) {
+        return -1;
+    }
 
-  return 0;
+    return 0;
 }

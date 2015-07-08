@@ -95,7 +95,7 @@ double find_root(function<double(double)> func)
 {
     using func_type = function<double(double)>;
 
-    double root {0.0}, x_lower{-0.5}, x_upper{5.0};
+    double root {0.0}, x_lower {-0.5}, x_upper {5.0};
     const gsl_root_fsolver_type *T = gsl_root_fsolver_brent;
     gsl_root_fsolver *solver = gsl_root_fsolver_alloc(T);
 
@@ -107,18 +107,17 @@ double find_root(function<double(double)> func)
 
     gsl_root_fsolver_set(solver, &F, x_lower, x_upper);
 
-    int status, c{0};
-    while(true)
-    {
-      status = gsl_root_fsolver_iterate(solver);
-      root = gsl_root_fsolver_root(solver);
-      x_lower = gsl_root_fsolver_x_lower(solver);
-      x_upper = gsl_root_fsolver_x_upper(solver);
-      status = gsl_root_test_interval(x_lower, x_upper, 0, 0.001);
+    int status, c {0};
+    while(true) {
+        status = gsl_root_fsolver_iterate(solver);
+        root = gsl_root_fsolver_root(solver);
+        x_lower = gsl_root_fsolver_x_lower(solver);
+        x_upper = gsl_root_fsolver_x_upper(solver);
+        status = gsl_root_test_interval(x_lower, x_upper, 0, 0.001);
 
-      ++c;
-      if(c > 50) throw std::runtime_error("Could't find root");
-      if(status == GSL_SUCCESS) break;
+        ++c;
+        if(c > 50) throw std::runtime_error("Could't find root");
+        if(status == GSL_SUCCESS) break;
     }
 
     gsl_root_fsolver_free(solver);
@@ -134,6 +133,8 @@ double find_root(function<double(double)> func)
 */
 double find_root(function<double(double)> func, double y)
 {
-  auto f = [&](double x) {return func(x) - y;};
-  return find_root(f);
+    auto f = [&](double x) {
+        return func(x) - y;
+    };
+    return find_root(f);
 }

@@ -71,7 +71,7 @@ double Terradyn::getSigma1_(const double& theta, const double& theta1) const
 *    @return radial stress in the rear region of the soil
 */
 double Terradyn::getSigma2_(const double& theta, const double& theta1, const double& theta2,
-                             const double& theta_m) const
+                            const double& theta_m) const
 {
     double z = (cos(theta1 - ((theta - theta2) / (theta_m - theta2)) * (theta1 - theta_m))
                 - cos(theta1)) * wheel_.r;
@@ -88,7 +88,7 @@ double Terradyn::getSigma2_(const double& theta, const double& theta1, const dou
 *    @return radial stress in the any region of the soil
 */
 double Terradyn::getSigma(const double& theta, const double& theta1, const double& theta2,
-                           const double& theta_m) const
+                          const double& theta_m) const
 {
     double sigma {0.0};
     if(theta > theta_m && theta <= theta1)
@@ -109,7 +109,7 @@ double Terradyn::getSigma(const double& theta, const double& theta1, const doubl
 *    @return radial stress in the any region of the soil
 */
 double Terradyn::getTau_x(const double& theta, const double& theta1, const double& theta2,
-                         const double& theta_m, const double& slip) const
+                          const double& theta_m, const double& slip) const
 {
     double tau {0.0};
     if(theta >= theta2 && theta <= theta1) {
@@ -132,16 +132,16 @@ double Terradyn::getTau_x(const double& theta, const double& theta1, const doubl
 *    @return radial stress in the any region of the soil
 */
 double Terradyn::getTau_y(const double& theta, const double& theta1, const double& theta2,
-                         const double& theta_m, const double& slip, const double& beta) const
+                          const double& theta_m, const double& slip, const double& beta) const
 {
     double tau {0.0};
     if(theta >= theta2 && theta <= theta1) {
         double sigma = getSigma(theta, theta1, theta2, theta_m);
         double j = (wheel_.r * (1.0-slip) * (theta1-theta) * tan(beta));
         if(std::isinf(j))
-          tau = (soil_.c + sigma * tan(soil_.phi)) * (1.0 - exp(-j / soil_.k_y));
+            tau = (soil_.c + sigma * tan(soil_.phi)) * (1.0 - exp(-j / soil_.k_y));
         else
-          tau = (soil_.c + sigma * tan(soil_.phi));
+            tau = (soil_.c + sigma * tan(soil_.phi));
 
     }
     return tau;
