@@ -58,7 +58,7 @@ Terradyn::Terradyn(const Soil& soil, const Wheel& wheel) : soil_ {soil}, wheel_ 
 double Terradyn::getSigma1_(const double& theta, const double& theta1) const
 {
     double z = (cos(theta) - cos(theta1)) * wheel_.r; //! sinkage
-    double sigma1 = (soil_.k_phi + soil_.k_c * wheel_.b) * pow(z / wheel_.b, soil_.n);
+    double sigma1 = (soil_.k_phi + soil_.k_c / wheel_.b) * pow(z, soil_.n);
     return sigma1;
 }
 
@@ -75,7 +75,7 @@ double Terradyn::getSigma2_(const double& theta, const double& theta1, const dou
 {
     double z = (cos(theta1 - ((theta - theta2) / (theta_m - theta2)) * (theta1 - theta_m))
                 - cos(theta1)) * wheel_.r;
-    double sigma_2 = soil_.k_phi * pow(z / wheel_.b, soil_.n); //! k_c is k_eq here
+    double sigma_2 = (soil_.k_c / wheel_.b + soil_.k_phi) * pow(z, soil_.n);
     return sigma_2;
 }
 
@@ -115,7 +115,7 @@ double Terradyn::getTau_x(const double& theta, const double& theta1, const doubl
     if(theta >= theta2 && theta <= theta1) {
         double sigma = getSigma(theta, theta1, theta2, theta_m);
         double j = ((theta1 - theta) - (1 - slip) * (sin(theta1) - sin(theta))) * wheel_.r;
-        tau = (soil_.c + sigma * tan(soil_.phi)) * (1 - exp(-j / soil_.K));
+        tau = (soil_.c + sigma * tan(soil_.phi)) * (1 - exp(-j / soil_.k_x));
 
     }
     return tau;
@@ -139,7 +139,7 @@ double Terradyn::getTau_y(const double& theta, const double& theta1, const doubl
         double sigma = getSigma(theta, theta1, theta2, theta_m);
         double j = (wheel_.r * (1.0-slip) * (theta1-theta) * tan(beta));
         if(std::isinf(j))
-          tau = (soil_.c + sigma * tan(soil_.phi)) * (1.0 - exp(-j / soil_.K));
+          tau = (soil_.c + sigma * tan(soil_.phi)) * (1.0 - exp(-j / soil_.k_y));
         else
           tau = (soil_.c + sigma * tan(soil_.phi));
 
