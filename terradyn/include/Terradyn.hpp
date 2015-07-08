@@ -52,8 +52,8 @@ struct Soil {
     double c {0.0};               //! cohesion[Pa]
     double k_x{0.014};            //! shear deformation modulus[m]
     double k_y{0.016};            //! shear deformation modulus[m]
-    double k_c{1370};
-    double k_phi{};
+    double k_c{0.0};
+    double k_phi{1203.54};
     double n {1.0};                  //! exponent of sinkage to width ratio
     double gamma {0.0575};            //! density[N/m^3]
     double d{1.0}; // sink constant[m/]

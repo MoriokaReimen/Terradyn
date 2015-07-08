@@ -32,8 +32,6 @@
 #define rho  1.4905*1000.0
 #define phi  38.0 * M_PI / 180.0
 
-#define kappa 0.5
-
 #define delta 10.0 * M_PI / 180.0  // roll
 #define alpha 0.0 * M_PI / 180.0  // pitch
 
