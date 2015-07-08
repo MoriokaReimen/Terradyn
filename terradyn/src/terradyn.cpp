@@ -179,7 +179,7 @@ void tCalc_Fe_positive(double s, double beta, double theta_f, double theta_r,  d
   // the angle of max stress
   theta_m = (a_0 + a_1 * s) * theta_f;
 
-  if(K_flag==0)
+  if(K_flag==1)
     //bekker
     K = (k_c / w_b + k_phi) * pow(w_rad,n);
   else
