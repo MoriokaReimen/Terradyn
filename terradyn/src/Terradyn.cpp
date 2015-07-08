@@ -1,6 +1,6 @@
 /**
 -----------------------------------------------------------------------------
-@file    wheel_soil.cpp
+@file    Terradyn.cpp
 ----------------------------------------------------------------------------
          @@
        @@@@@@
@@ -33,7 +33,7 @@
 @brief Encapsulates Bekker-Wong Theory for Vehicle-Wheel Interactionshear
 -----------------------------------------------------------------------------
 */
-#include "wheel_soil.hpp"
+#include "Terradyn.hpp"
 
 using std::cos;
 using std::sin;
@@ -42,11 +42,11 @@ using std::bind;
 using std::placeholders::_1;
 
 /*
-*    @brief Constructor of WheelSoil
+*    @brief Constructor of Terradyn
 *    @param [in] soil soil parameters
 *    @param [in] wheel wheel parameters
 */
-WheelSoil::WheelSoil(const Soil& soil, const Wheel& wheel) : soil_ {soil}, wheel_ {wheel} {
+Terradyn::Terradyn(const Soil& soil, const Wheel& wheel) : soil_ {soil}, wheel_ {wheel} {
 }
 
 /*
@@ -55,7 +55,7 @@ WheelSoil::WheelSoil(const Soil& soil, const Wheel& wheel) : soil_ {soil}, wheel
 *    @param [in] theta1 entry angle[radian]
 *    @return radial stress in the front region of the soil[Pa]
 */
-double WheelSoil::getSigma1_(const double& theta, const double& theta1) const
+double Terradyn::getSigma1_(const double& theta, const double& theta1) const
 {
     double z = (cos(theta) - cos(theta1)) * wheel_.r; //! sinkage
     double sigma1 = (soil_.k1 + soil_.k2 * wheel_.b) * pow(z / wheel_.b, soil_.n);
@@ -70,7 +70,7 @@ double WheelSoil::getSigma1_(const double& theta, const double& theta1) const
 *    @param [in] theta_m angular position of the maximum radial stress[radian]
 *    @return radial stress in the rear region of the soil
 */
-double WheelSoil::getSigma2_(const double& theta, const double& theta1, const double& theta2,
+double Terradyn::getSigma2_(const double& theta, const double& theta1, const double& theta2,
                              const double& theta_m) const
 {
     double z = (cos(theta1 - ((theta - theta2) / (theta_m - theta2)) * (theta1 - theta_m))
@@ -87,7 +87,7 @@ double WheelSoil::getSigma2_(const double& theta, const double& theta1, const do
 *    @param [in] theta_m angular position of the maximum radial stress[radian]
 *    @return radial stress in the any region of the soil
 */
-double WheelSoil::getSigma(const double& theta, const double& theta1, const double& theta2,
+double Terradyn::getSigma(const double& theta, const double& theta1, const double& theta2,
                            const double& theta_m) const
 {
     double sigma {0.0};
@@ -108,7 +108,7 @@ double WheelSoil::getSigma(const double& theta, const double& theta1, const doub
 *    @param [in] slip  slip ratio
 *    @return radial stress in the any region of the soil
 */
-double WheelSoil::getTau_x(const double& theta, const double& theta1, const double& theta2,
+double Terradyn::getTau_x(const double& theta, const double& theta1, const double& theta2,
                          const double& theta_m, const double& slip) const
 {
     double tau {0.0};
@@ -131,7 +131,7 @@ double WheelSoil::getTau_x(const double& theta, const double& theta1, const doub
 *    @param [in] beta  slip ratio
 *    @return radial stress in the any region of the soil
 */
-double WheelSoil::getTau_y(const double& theta, const double& theta1, const double& theta2,
+double Terradyn::getTau_y(const double& theta, const double& theta1, const double& theta2,
                          const double& theta_m, const double& slip, const double& beta) const
 {
     double tau {0.0};
@@ -155,9 +155,9 @@ double WheelSoil::getTau_y(const double& theta, const double& theta1, const doub
 *    @param [in] slip  slip ratio
 *    @return radial stress in the any region of the soil
 */
-double WheelSoil::getWheelTorque( const double& theta1, const double& theta2, const double& theta_m, const double& slip) const
+double Terradyn::getWheelTorque( const double& theta1, const double& theta2, const double& theta_m, const double& slip) const
 {
-    auto tau_func = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
+    auto tau_func = bind(&Terradyn::getTau_x, this, _1, theta1, theta2, theta_m, slip);
     double torque = wheel_.b * wheel_.r * wheel_.r * integrate(tau_func, theta1, theta2);
     return torque;
 }
@@ -170,13 +170,13 @@ double WheelSoil::getWheelTorque( const double& theta1, const double& theta2, co
 *    @param [in] slip  slip ratio
 *    @return drawbarpull of wheel
 */
-double WheelSoil::getDrawbar(const double& theta1, const double& theta2, const double& theta_m, const double& slip) const
+double Terradyn::getDrawbar(const double& theta1, const double& theta2, const double& theta_m, const double& slip) const
 {
-    auto sigma_buff = bind(&WheelSoil::getSigma, this, _1, theta1, theta2, theta_m);
+    auto sigma_buff = bind(&Terradyn::getSigma, this, _1, theta1, theta2, theta_m);
     auto sigma_func = [&](double x) {
         return sigma_buff(x) * sin(x);
     };
-    auto tau_buff = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
+    auto tau_buff = bind(&Terradyn::getTau_x, this, _1, theta1, theta2, theta_m, slip);
     auto tau_func = [&](double x) {
         return tau_buff(x) * cos(x);
     };
@@ -192,16 +192,16 @@ double WheelSoil::getDrawbar(const double& theta1, const double& theta2, const d
 *    @param [in] theta2 exit angle[radian]
 *    @return force vector on the wheel
 */
-Eigen::Vector3d WheelSoil::getForce(double slip, double theta1, double theta2) const
+Eigen::Vector3d Terradyn::getForce(double slip, double theta1, double theta2) const
 {
     Eigen::Vector3d force;
     double beta = this->getBeta();
     double fx, fy, fz;
     double theta_m = this->getTheta_m(slip, theta1);
 
-    auto tau_x_buff = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
-    auto tau_y_buff = bind(&WheelSoil::getTau_y, this, _1, theta1, theta2, theta_m, slip, beta);
-    auto sigma_buff = bind(&WheelSoil::getSigma, this, _1, theta1, theta2, theta_m);
+    auto tau_x_buff = bind(&Terradyn::getTau_x, this, _1, theta1, theta2, theta_m, slip);
+    auto tau_y_buff = bind(&Terradyn::getTau_y, this, _1, theta1, theta2, theta_m, slip, beta);
+    auto sigma_buff = bind(&Terradyn::getSigma, this, _1, theta1, theta2, theta_m);
 
     auto fx_func = [&](double x) {
         return tau_x_buff(x) * cos(x) - sigma_buff(x) * sin(x);
@@ -231,15 +231,15 @@ Eigen::Vector3d WheelSoil::getForce(double slip, double theta1, double theta2) c
 *    @param [in] theta2 exit angle[radian]
 *    @return torque vector on the wheel
 */
-Eigen::Vector3d WheelSoil::getTorque(double slip, double theta1, double theta2) const
+Eigen::Vector3d Terradyn::getTorque(double slip, double theta1, double theta2) const
 {
     Eigen::Vector3d torque;
 
     double theta_m = this->getTheta_m(slip, theta1);
     double beta = this->getBeta();
 
-    auto tau_x_buff = bind(&WheelSoil::getTau_x, this, _1, theta1, theta2, theta_m, slip);
-    auto tau_y_buff = bind(&WheelSoil::getTau_y, this, _1, theta1, theta2, theta_m, slip, beta);
+    auto tau_x_buff = bind(&Terradyn::getTau_x, this, _1, theta1, theta2, theta_m, slip);
+    auto tau_y_buff = bind(&Terradyn::getTau_y, this, _1, theta1, theta2, theta_m, slip, beta);
     auto  tau_x = [&](double x) {
         return tau_x_buff(x);
     };
@@ -260,7 +260,7 @@ Eigen::Vector3d WheelSoil::getTorque(double slip, double theta1, double theta2) 
 *    @param [in] theta1 entry angle[radian]
 *    @return angle at max sigma[radian]
 */
-double WheelSoil::getTheta_m(const double& slip, const double& theta1) const
+double Terradyn::getTheta_m(const double& slip, const double& theta1) const
 {
     double theta_m = (soil_.a0 + soil_.a1 * slip) * theta1;
     return theta_m;
@@ -270,7 +270,7 @@ double WheelSoil::getTheta_m(const double& slip, const double& theta1) const
 *    @brief Get beta
 *    @return slip angle[radian]
 */
-double WheelSoil::getBeta() const
+double Terradyn::getBeta() const
 {
     //double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), toRadian(45));
     double beta = fabs(asin(wheel_.velocity(1) / wheel_.velocity(0)));

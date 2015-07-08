@@ -10,7 +10,7 @@ set(SRC
 src/angle.cpp
 src/gsl.cpp
 src/terradyn.cpp
-src/wheel_soil.cpp
+src/Terradyn.cpp
 )
 
 add_library(terradyn  STATIC ${SRC})
@@ -18,7 +18,7 @@ add_library(terradyn  STATIC ${SRC})
 set(TEST_SRC
 test/main.cpp
 test/test-gsl.cpp
-test/test-wheel_soil.cpp
+test/test-terradyn.cpp
 )
 add_executable(test-terradyn ${SRC} ${TEST_SRC})
 target_link_libraries(test-terradyn gtest gsl gslcblas pthread terradyn)

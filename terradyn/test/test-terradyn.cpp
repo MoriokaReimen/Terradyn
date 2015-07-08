@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "wheel_soil.hpp"
+#include "Terradyn.hpp"
 #include "terradyn.hpp"
 #include <iostream>
 #include <cmath>
@@ -12,7 +12,7 @@ TEST(WheelSoilTEST, getForce)
   wheel.velocity(1) = 2.0;
   wheel.velocity(2) = -1.0;
 
-  WheelSoil wheel_soil(soil, wheel);
+  Terradyn wheel_soil(soil, wheel);
   double beta = wheel_soil.getBeta();
   double slip = 0.6;
   double theta1 = toRadian(20);
@@ -36,7 +36,7 @@ TEST(WheelSoilTEST, getTorque)
   wheel.velocity(1) = 2.0;
   wheel.velocity(2) = -1.0;
 
-  WheelSoil wheel_soil(soil, wheel);
+  Terradyn wheel_soil(soil, wheel);
   double beta = wheel_soil.getBeta();
   double slip = 0.6;
   double theta1 = toRadian(20);

@@ -51,8 +51,8 @@ struct Soil {
     double phi {1203.54}; //! angle of internal shearing resistance
     double c {0.0};               //! cohesion[Pa]
     double K {0.00068509};            //! shear deformation modulus[m]
-    double k1 {0.141e6};             //! pressure sinkage modulus 1
-    double k2 {0.0};                   //! pressure sinkage modulus 2
+    double k1{};
+    double k2{};
     double n {1.703};                  //! exponent of sinkage to width ratio
     double gamma {0.0575};            //! density[N/m^3]
     double d{1.0}; // sink constant[m/]
@@ -72,10 +72,10 @@ struct Wheel {
 };
 
 /*
-*    @class WheelSoil
+*    @class Terradyn
 *    @brief Encapsulates Bekker-Wong Theory for Vehicle-Wheel Interaction
 */
-class WheelSoil
+class Terradyn
 {
 private:
     Soil soil_;
@@ -84,7 +84,7 @@ private:
     double getSigma2_(const double& theta, const double& theta1, const double& theta2,
                       const double& theta_m) const;
 public:
-    WheelSoil(const Soil& soil, const Wheel& wheel);
+    Terradyn(const Soil& soil, const Wheel& wheel);
     double getSigma(const double& theta, const double& theta1, const double& theta2,
                     const double& theta_m) const;
     double getTau_x(const double& theta, const double& theta1, const double& theta2,
