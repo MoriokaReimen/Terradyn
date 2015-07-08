@@ -178,12 +178,7 @@ void tCalc_Fe_positive(double s, double beta, double theta_f, double theta_r,  d
     // the angle of max stress
     theta_m = (a_0 + a_1 * s) * theta_f;
 
-    if(K_flag==1)
-        //bekker
-        K = (k_c / w_b + k_phi) * pow(w_rad,n);
-    else
-        //reece
-        K = (c*k_c + rho*k_phi*w_b) * pow(w_rad/w_b, n);
+    K = (k_c / w_b + k_phi) * pow(w_rad,n);
 
     beta = fabs(beta);
     if(beta>deg2rad(45))
@@ -246,8 +241,8 @@ void tCalc_Fe_positive(double s, double beta, double theta_f, double theta_r,  d
     Fz *= (w_rad * w_b);
     Tz *= (w_rad * w_rad * w_b);
 
-    fe[0] = Fx - Fs*sin(beta)*cos(beta);
-    fe[1] = Fu + Fs*sin(beta)*sin(beta);
+    fe[0] = Fx;
+    fe[1] = Fu;
 
     fe[2] = Fz - Dz*vz;
     fe[3] = Tz;
