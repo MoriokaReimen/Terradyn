@@ -367,8 +367,8 @@ void tCalc_Fe_negative(double s, double beta, double theta_f, double theta_r,  d
   Fz *= (w_rad * w_b);
   Tz *= (w_rad * w_rad * w_b);
   
-  fe[0] = Fx - Fs*sin(beta)*cos(beta);
-  fe[1] = Fu + Fs*sin(beta)*sin(beta);
+  fe[0] = Fx;
+  fe[1] = Fu;
 
   fe[2] = Fz - Dz*vz;
   fe[3] = Tz;
