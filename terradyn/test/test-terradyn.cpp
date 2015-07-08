@@ -25,13 +25,9 @@ TEST(WheelSoilTEST, getForce)
 
   auto force = wheel_soil.getForce(slip, theta1, theta2);
 
-  std::cout << fe[0] << "," << force(0) << std::endl;
-  std::cout << fe[1] << "," << force(1) << std::endl;
-  std::cout << fe[2] << "," << force(2) << std::endl;
-  std::cout << std::endl << std::endl;
-  EXPECT_NEAR(fe[0], force(0), 0.3);
-  EXPECT_NEAR(fe[1], force(1), 0.3);
-  EXPECT_NEAR(fe[2], force(2), 0.3);
+  EXPECT_NEAR(0.0, force(0)/fe[0] - 1, 0.15);
+  EXPECT_NEAR(0.0, force(1)/fe[1] - 1, 0.15);
+  EXPECT_NEAR(0.0, force(2)/fe[2] - 1, 0.15);
 }
 
 TEST(WheelSoilTEST, getTorque)
@@ -53,11 +49,8 @@ TEST(WheelSoilTEST, getTorque)
 
   auto torque = wheel_soil.getTorque(slip, theta1, theta2);
 
-  std::cout << 0 << "," << torque(0) << std::endl;
-  EXPECT_NEAR(0, torque(0), 0.3);
-  std::cout << fe[4] << "," << torque(1) << std::endl;
-  EXPECT_NEAR(fe[4], torque(1), 0.3);
-  std::cout << fe[3] << "," << torque(2) << std::endl;
-  EXPECT_NEAR(fe[3], torque(2), 0.3);
+  EXPECT_NEAR(0, torque(0), 0.15);
+  EXPECT_NEAR(0.0, torque(1)/fe[3] -1.0, 0.15);
+  EXPECT_NEAR(0.0, torque(2)/fe[4] -1.0, 0.15);
 }
 
