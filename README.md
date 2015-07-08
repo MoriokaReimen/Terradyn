@@ -19,7 +19,7 @@ Terramechanics simulator with ODE
 
 * need comment
 * refine directory structure
-* remove gtest notes
+* There is 15% difference between Ishigami's function and K's function
 
 ## Licence
 
