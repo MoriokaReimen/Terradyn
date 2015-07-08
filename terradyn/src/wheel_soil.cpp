@@ -138,7 +138,10 @@ double WheelSoil::getTau_y(const double& theta, const double& theta1, const doub
     if(theta >= theta2 && theta <= theta1) {
         double sigma = getSigma(theta, theta1, theta2, theta_m);
         double j = (wheel_.r * (1.0-slip) * (theta1-theta) * tan(beta));
-        tau = (soil_.c + sigma * tan(soil_.phi)) * (1.0 - exp(-j / soil_.K));
+        if(std::isinf(j))
+          tau = (soil_.c + sigma * tan(soil_.phi)) * (1.0 - exp(-j / soil_.K));
+        else
+          tau = (soil_.c + sigma * tan(soil_.phi));
 
     }
     return tau;
@@ -269,6 +272,7 @@ double WheelSoil::getTheta_m(const double& slip, const double& theta1) const
 */
 double WheelSoil::getBeta() const
 {
-    double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), toRadian(45));
+    //double beta = std::min(fabs(asin(wheel_.velocity(1) / wheel_.velocity(0))), toRadian(45));
+    double beta = fabs(asin(wheel_.velocity(1) / wheel_.velocity(0)));
     return beta;
 }
