@@ -49,11 +49,11 @@ using std::function;
 */
 struct Soil {
     double phi {0.0}; //! angle of internal shearing resistance
-    double c {298.123};               //! cohesion[Pa]
+    double c {0.0};               //! cohesion[Pa]
     double K {0.00068509};            //! shear deformation modulus[m]
     double k1 {0.141e6};             //! pressure sinkage modulus 1
     double k2 {0.0};                   //! pressure sinkage modulus 2
-    double n {0.89};                  //! exponent of sinkage to width ratio
+    double n {1.703};                  //! exponent of sinkage to width ratio
     double gamma {0.0575};            //! density[N/m^3]
     double d{1.0}; // sink constant[m/]
     double a0{0.4}; // max sigma angle constant1
@@ -66,9 +66,8 @@ struct Soil {
 */
 struct Wheel {
     /* Wheel properties */
-    double r {0.13};                   //! radius[m]
-    double b {0.16};                   //! width[m]
-    double w {135};                   //! vertical axle load[N]
+    double r {0.055};                   //! radius[m]
+    double b {0.064};                   //! width[m]
     Eigen::Vector3d velocity;
 };
 
