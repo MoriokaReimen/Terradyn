@@ -220,8 +220,8 @@ Eigen::Vector3d Terradyn::getForce(double slip, double theta1, double theta2) co
     fy = (wheel_.r * wheel_.b) * integrate(fy_func, theta1, theta2);
     fz = (wheel_.r * wheel_.b) * integrate(fz_func, theta1, theta2);
 
-    force(0) = fx;
-    force(1) = fy;
+    force(0) = - fx;
+    force(1) = - fy;
     force(2) = fz - soil_.d * wheel_.velocity(2);
 
     return force;
@@ -251,8 +251,8 @@ Eigen::Vector3d Terradyn::getTorque(double slip, double theta1, double theta2) c
     };
 
     torque(0) = 0;
-    torque(1) = wheel_.r * wheel_.r * wheel_.b * integrate(tau_x, theta1, theta2);
-    torque(2) = wheel_.r * wheel_.r * wheel_.b * integrate(tau_y, theta1, theta2) * sin(theta_m); // self aligning torque
+    torque(1) = - wheel_.r * wheel_.r * wheel_.b * integrate(tau_x, theta1, theta2);
+    torque(2) = - wheel_.r * wheel_.r * wheel_.b * integrate(tau_y, theta1, theta2) * sin(theta_m); // self aligning torque
 
     return torque;
 }

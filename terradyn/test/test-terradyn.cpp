@@ -8,6 +8,8 @@ TEST(WheelSoilTEST, getForce)
 {
   Soil soil;
   Wheel wheel;
+  wheel.r = 0.055;
+  wheel.b = 0.064;
   wheel.velocity(0) = 5.0;
   wheel.velocity(1) = 2.0;
   wheel.velocity(2) = -1.0;
