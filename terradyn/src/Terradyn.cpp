@@ -58,7 +58,7 @@ Terradyn::Terradyn(const Soil& soil, const Wheel& wheel) : soil_ {soil}, wheel_ 
 double Terradyn::getSigma1_(const double& theta, const double& theta1) const
 {
     double z = (cos(theta) - cos(theta1)) * wheel_.r; //! sinkage
-    double sigma1 = (soil_.k1 + soil_.k2 * wheel_.b) * pow(z / wheel_.b, soil_.n);
+    double sigma1 = (soil_.k_phi + soil_.k_c * wheel_.b) * pow(z / wheel_.b, soil_.n);
     return sigma1;
 }
 
@@ -75,7 +75,7 @@ double Terradyn::getSigma2_(const double& theta, const double& theta1, const dou
 {
     double z = (cos(theta1 - ((theta - theta2) / (theta_m - theta2)) * (theta1 - theta_m))
                 - cos(theta1)) * wheel_.r;
-    double sigma_2 = soil_.k1 * pow(z / wheel_.b, soil_.n); //! k1 is k_eq here
+    double sigma_2 = soil_.k_phi * pow(z / wheel_.b, soil_.n); //! k_c is k_eq here
     return sigma_2;
 }
 

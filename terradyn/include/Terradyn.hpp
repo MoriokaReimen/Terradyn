@@ -48,11 +48,11 @@ using std::function;
 *    @brief parameters for Soil
 */
 struct Soil {
-    double phi {1203.54}; //! angle of internal shearing resistance
+    double phi {toRadian(38.0)}; //! angle of internal shearing resistance
     double c {0.0};               //! cohesion[Pa]
     double K {0.00068509};            //! shear deformation modulus[m]
-    double k1{};
-    double k2{};
+    double k_c{0.0};
+    double k_phi{1203.54};
     double n {1.703};                  //! exponent of sinkage to width ratio
     double gamma {0.0575};            //! density[N/m^3]
     double d{1.0}; // sink constant[m/]
