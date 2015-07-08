@@ -10,7 +10,7 @@
 #include<stdio.h>
 #include<math.h>
 
-#include"terradyn.h"
+#include"terradyn.hpp"
 
 #define sqr_f(x) x*x
 #define cot(x) 1/tan(x)

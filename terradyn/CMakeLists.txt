@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -fPIC")
 set(SRC
 src/angle.cpp
 src/gsl.cpp
-src/terradyn.c
+src/terradyn.cpp
 src/wheel_soil.cpp
 )
 
@@ -21,5 +21,5 @@ test/test-gsl.cpp
 test/test-wheel_soil.cpp
 )
 add_executable(test-terradyn ${SRC} ${TEST_SRC})
-target_link_libraries(test-terradyn gtest gsl gslcblas pthread)
+target_link_libraries(test-terradyn gtest gsl gslcblas pthread terradyn)
 
